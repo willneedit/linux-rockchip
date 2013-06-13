@@ -1641,11 +1641,11 @@ EXPORT_SYMBOL(mmc_set_blocklen);
 
 static int mmc_rescan_try_freq(struct mmc_host *host, unsigned freq)
 {
-	host->f_init = freq;
-
 #if defined(CONFIG_SDMMC_RK29) || !defined(CONFIG_SDMMC_RK29_OLD)   //Modifyed by xbw at 2011-11-17		
 	int init_ret=0;
 #endif
+	
+    host->f_init = freq;
 
 #ifdef CONFIG_MMC_DEBUG
 	pr_info("%s: %s: trying to init card at %u Hz\n",
@@ -1666,8 +1666,16 @@ static int mmc_rescan_try_freq(struct mmc_host *host, unsigned freq)
 #if !defined(CONFIG_USE_SDMMC0_FOR_WIFI_DEVELOP_BOARD)
     if( strncmp( mmc_hostname(host) ,"mmc0" , strlen("mmc0")) )
     {
-	    //sdio_reset(host);//make no sense; noteed by xbw at 2011-12-14
-    	mmc_go_idle(host);
+	    /* add by eyes.cb for realtek 8723as no power switch */
+        printk(KERN_INFO "%s..%d..  ===== reset SDIO. [%s]\n", __func__,  __LINE__, mmc_hostname(host));
+
+        sdio_reset(host);//make no sense; noteed by xbw at 2011-12-14
+    	
+        printk(KERN_INFO "%s..%d..  ===== reset SDIO Done! [%s]\n", __func__,  __LINE__, mmc_hostname(host));
+        
+        mmc_go_idle(host);
+
+        printk(KERN_INFO "%s..%d..  ===== [%s] go idle\n", __func__,  __LINE__, mmc_hostname(host));
 
     	if (!(init_ret=mmc_attach_sdio(host)))
     	{
@@ -1776,10 +1784,10 @@ freq_out:
 
 void mmc_rescan(struct work_struct *work)
 {
-	static const unsigned freqs[] = { 400000, 300000, 200000, 100000 };
+	//static const unsigned freqs[] = { 400000, 300000, 200000, 100000 };
 	struct mmc_host *host =
 		container_of(work, struct mmc_host, detect.work);
-	int i;
+	//int i;
 	bool extend_wakelock = false;
 
 	if (host->rescan_disable)

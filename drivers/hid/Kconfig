@@ -610,6 +610,12 @@ config HID_ZYDACRON
 	---help---
 	Support for Zydacron remote control.
 
+config HID_SAGE
+	tristate "Sage 3d remote control support"
+	depends on USB_HID
+	select HIDRAW
+	---help---
+	Support for Sage 3d remote control.
 endmenu
 
 endif # HID_SUPPORT

@@ -1,3 +1,5 @@
+/*$_rbox_$_ modify _$hzb,20120522*/
+/*$_rbox_$_ modify _$add this file for rk29 remotectl*/
 
 /*
  * Driver for keys on GPIO lines capable of generating interrupts.
@@ -144,6 +146,93 @@ static struct rkxx_remote_key_table remote_key_table_df[] = {
     {0x40, KEY_SEARCH},     //search
 };
 
+//neildebug_s
+static struct rkxx_remote_key_table remote_key_table_minix[] = {
+/*
+    {0x45, KEY_POWER},
+    {0x46, KEY_VOLUMEDOWN}, 
+    {0x47, KEY_VOLUMEUP},
+    {0x44, KEY_HOME},
+    {0x40, KEY_MENU},
+    {0x43,KEY_BACK},  ////////
+    {0x07, 185},
+    {0x15, KEY_UP},
+    {0x09, 186},     		//home
+    {0x16, KEY_LEFT},          //rorate left
+    {0x19, KEY_ENTER},          //rorate right
+    {0x0D, KEY_RIGHT},          //zoom out
+    {0x0C, KEY_PAGEUP},          //zoom in
+    {0x18, KEY_DOWN},       //mute
+    {0x5E, KEY_MUTE},       //mute    
+    {0x08, KEY_PAGEDOWN},     //power off
+    {0x5A, KEY_SEARCH},     //search  
+*/
+    {0xA2, KEY_POWER},
+    {0x62, KEY_VOLUMEDOWN}, 
+    {0xE2, KEY_VOLUMEUP},
+    {0x22, KEY_HOME},
+    {0x02, KEY_MENU},
+    {0xC2,KEY_BACK},  ////////
+    {0xE0, 186},			//TV_ZOOM_IN
+    {0xA8, KEY_UP},
+    {0x90, 185},     		//TV_ZOOM_OUT
+    {0x68, KEY_LEFT},          //
+    {0x98, KEY_ENTER},          //
+    {0xB0, KEY_RIGHT},          //
+    {0x30, KEY_SEARCH},     //
+    {0x18, KEY_DOWN},       //
+    {0x7A, KEY_MUTE},       //     
+    {0x10, 67},     //TV_MEDIA_REWIND
+    {0x38, 402},          //TV_MEDIA_PLAY_PAUSE
+    {0x5a, 68},          //TV_MEDIA_FAST_FORWARD     
+    {0x42, 87},          //TV_MEDIA_PREVIOUS
+    {0x4a, 66},          //TV_MEDIA_STOP
+    {0x52, 88},          //TV_MEDIA_NEXT                   
+};
+
+static struct rkxx_remote_key_table remote_key_table_philips[] = {
+
+    {0xA2, KEY_POWER},
+    {0x31, KEY_VOLUMEDOWN}, 
+    {0xBB, KEY_VOLUMEUP},
+    {0xA3, KEY_MENU},      
+    {0x53, KEY_UP},  
+    {0x4B, KEY_DOWN},  
+    {0x99, KEY_LEFT},  
+    {0x83, KEY_RIGHT},  
+    {0x73, KEY_ENTER},  
+    {0x0B, KEY_BACK},  
+    {0x6B, KEY_HOME},  
+};
+
+static struct rkxx_remote_key_table remote_key_table_hof11a[] = {
+
+    {0xAF, KEY_POWER},
+    {0x27, KEY_VOLUMEDOWN}, 
+    {0xBD, KEY_VOLUMEUP},
+    {0xA7, KEY_MENU},      
+    {0x4B, KEY_UP},  
+    {0x8B, KEY_DOWN},  
+    {0x5F, KEY_LEFT},  
+    {0x9F, KEY_RIGHT},  
+    {0x0B, KEY_ENTER},  
+    {0x2F, KEY_BACK},  
+    {0xEF, KEY_HOME},  
+};
+
+static struct rkxx_remote_key_table remote_key_table_tongfang[] = {
+    {0xB0, KEY_ENTER},//ok = DPAD CENTER
+    {0x42, KEY_BACK}, 
+    {0xD0, KEY_UP},
+    {0x70, KEY_DOWN},
+    {0x08, KEY_LEFT},
+    {0x88, KEY_RIGHT},  ////////
+    {0x58, KEY_HOME},     //home
+    {0xB2, KEY_POWER},     //power off
+    {0xA2, KEY_MENU},
+};
+//neildebug_e
+
 extern suspend_state_t get_suspend_state(void);
 
 
@@ -151,14 +240,33 @@ static struct rkxx_remotectl_button remotectl_button[] =
 {
     {  
        .usercode = 0x202, 
-       .nbuttons =  22, 
-       .key_table = &remote_key_table_meiyu_202[0],
+       .nbuttons =  9, 
+       .key_table = &remote_key_table_tongfang[0],
     },
     {  
        .usercode = 0xdf, 
        .nbuttons =  16, 
        .key_table = &remote_key_table_df[0],
     },
+    
+//neildebug_s
+    {  
+       .usercode = 0x00ff, 
+       .nbuttons =  21, 
+       .key_table = &remote_key_table_minix[0],
+    },
+    {  
+       .usercode = 0x40BD, 
+       .nbuttons =  11, 
+       .key_table = &remote_key_table_philips[0],
+    },   
+    {  
+       .usercode = 0x08F7, 
+       .nbuttons =  11, 
+       .key_table = &remote_key_table_hof11a[0],
+    }, 
+ 	
+//neildebug_e
 };
 
 
@@ -180,7 +288,6 @@ static int remotectl_keycode_lookup(struct rkxx_remotectl_drvdata *ddata)
 {	
     int i;	
     unsigned char keyData = ((ddata->scanData >> 8) & 0xff);
-
     for (i = 0; i < remotectl_button[ddata->keybdNum].nbuttons; i++){
         if (remotectl_button[ddata->keybdNum].key_table[i].scanCode == keyData){			
             ddata->keycode = remotectl_button[ddata->keybdNum].key_table[i].keyCode;
@@ -229,7 +336,7 @@ static void remotectl_do_something(unsigned long  data)
             }
 
             if (ddata->count == 0x10){//16 bit user code
-               // printk("u=0x%x\n",((ddata->scanData)&0xFFFF));
+                //printk("u=0x%x\n",((ddata->scanData)&0xFFFF));
                 if (remotectl_keybdNum_lookup(ddata)){
                     ddata->state = RMC_GETDATA;
                     ddata->scanData = 0;
@@ -251,7 +358,14 @@ static void remotectl_do_something(unsigned long  data)
                 ddata->scanData |= 0x01;
             }           
             if (ddata->count == 0x10){
-               // printk(KERN_ERR "d=%x\n",(ddata->scanData&0xFFFF));
+//neilnee_20120115_s
+				if (ddata->keybdNum == 4)
+				{
+					ddata->scanData = (ddata->scanData&0x0ff) << 8;
+					ddata->scanData |= ((~ddata->scanData >> 8)&0x0ff);
+				}
+//neilnee_20120115_e
+                //printk(KERN_ERR "d=%x\n",(ddata->scanData&0xFFFF));
 
                 if ((ddata->scanData&0x0ff) == ((~ddata->scanData >> 8)&0x0ff)){
                     if (remotectl_keycode_lookup(ddata)){
@@ -477,6 +591,7 @@ static int __devinit remotectl_probe(struct platform_device *pdev)
 	ddata->nbuttons = pdata->nbuttons;
 	ddata->input = input;
   wake_lock_init(&ddata->remotectl_wake_lock, WAKE_LOCK_SUSPEND, "rk29_remote");
+  wake_lock(&ddata->remotectl_wake_lock);			//neilnee_20121218+++
   if (pdata->set_iomux){
   	pdata->set_iomux();
   }

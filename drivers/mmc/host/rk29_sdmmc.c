@@ -3224,8 +3224,7 @@ static irqreturn_t rk29_sdmmc_interrupt(int irq, void *dev_id)
     {
     	goto Exit_INT;
     }
-
-
+    
     if(pending & SDMMC_INT_CD) 
     {
         //disable_irq_nosync(host->irq);
@@ -3290,10 +3289,14 @@ static irqreturn_t rk29_sdmmc_interrupt(int irq, void *dev_id)
     {	
         xbwprintk(7, "%s..%d..  INT_SDIO  INT=0x%x   [%s]\n", \
 				__FUNCTION__, __LINE__, pending, host->dma_name);
-
-        rk29_sdmmc_write(host->regs, SDMMC_RINTSTS,SDMMC_INT_SDIO);
-        sdio_irq = 1;
-
+        /*by eyes.cb*/
+        if(!host->mmc->ops || !host->mmc->ops->enable_sdio_irq || !host->mmc->sdio_irq_thread) {
+            printk("ERROR!!! XXX NULL Pointer %s %d\n", __func__, __LINE__);
+            rk29_sdmmc_write(host->regs, SDMMC_RINTSTS, SDMMC_INT_SDIO);
+        } else {
+            rk29_sdmmc_write(host->regs, SDMMC_RINTSTS, SDMMC_INT_SDIO);
+            sdio_irq = 1;
+        }
         goto Exit_INT;
     }
 #endif
@@ -3531,7 +3534,7 @@ static int rk29_sdmmc_probe(struct platform_device *pdev)
 	struct rk29_sdmmc		*host;
 	struct resource			*regs;
 	struct rk29_sdmmc_platform_data *pdata;
-    int level_value;
+    //int level_value;
 	int				ret = 0;
 
 #if defined(CONFIG_RK29_SDIO_IRQ_FROM_GPIO)	
@@ -3648,9 +3651,9 @@ static int rk29_sdmmc_probe(struct platform_device *pdev)
     }
 
 #endif 
-	//mmc->ocr_avail = pdata->host_ocr_avail;
-	mmc->ocr_avail = MMC_VDD_27_28|MMC_VDD_28_29|MMC_VDD_29_30|MMC_VDD_30_31
-                     | MMC_VDD_31_32|MMC_VDD_32_33 | MMC_VDD_33_34 | MMC_VDD_34_35| MMC_VDD_35_36;    ///set valid volage 2.7---3.6v
+	mmc->ocr_avail = pdata->host_ocr_avail;
+	//mmc->ocr_avail = MMC_VDD_27_28|MMC_VDD_28_29|MMC_VDD_29_30|MMC_VDD_30_31
+    //                 | MMC_VDD_31_32|MMC_VDD_32_33 | MMC_VDD_33_34 | MMC_VDD_34_35| MMC_VDD_35_36;    ///set valid volage 2.7---3.6v
 	mmc->caps = pdata->host_caps;
 	mmc->re_initialized_flags = 1;
 	mmc->doneflag = 1;

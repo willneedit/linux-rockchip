@@ -214,7 +214,7 @@
     // refer to file /arch/arm/mach-rk30/include/mach/Iomux.h
     #define WIFI_HOST_WAKE RK30_PIN3_PD2
 
-    #if defined(CONFIG_RK903) || defined(CONFIG_RK901) || defined(CONFIG_RTL8192CU) || defined(CONFIG_RTL8188EU)
+    #if defined(CONFIG_RK903) || defined(CONFIG_RK901) || defined(CONFIG_RTL8192CU) || defined(CONFIG_RTL8188EU) || defined(CONFIG_RTL8723AS)
     //power
     #define RK30SDK_WIFI_GPIO_POWER_N               RK30_PIN3_PD0            
     #define RK30SDK_WIFI_GPIO_POWER_ENABLE_VALUE    GPIO_HIGH        
@@ -222,6 +222,11 @@
     #define RK30SDK_WIFI_GPIO_POWER_PIN_NAME        GPIO3D0_SDMMC1PWREN_NAME
     #define RK30SDK_WIFI_GPIO_POWER_IOMUX_FGPIO     GPIO3D_GPIO3D0
     
+    #elif  defined(CONFIG_RTL8189ES)
+        #define RK30SDK_WIFI_GPIO_POWER_N               RK30_PIN3_PD0
+        #define RK30SDK_WIFI_GPIO_POWER_ENABLE_VALUE    GPIO_HIGH
+	
+	
     #elif defined(CONFIG_BCM4329) || defined(CONFIG_BCM4319) 
     //power
     #define RK30SDK_WIFI_GPIO_POWER_N               RK30_PIN3_PD0                 

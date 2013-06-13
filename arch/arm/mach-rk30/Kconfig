@@ -75,6 +75,11 @@ config MACH_RK30_BOX_HOTDOG
 	bool "RK30 itv box hotdog board"
 		
 
+##$_minix_$_modify_begin
+config MACH_MINIX_NEO_X5_BOX
+	bool "minix neo x5 box board"
+	
+##$_minix_$_modify_end
 config MACH_RK30_PHONE_LOQUAT
 	bool "RK30 smart phone loquat board"
 
