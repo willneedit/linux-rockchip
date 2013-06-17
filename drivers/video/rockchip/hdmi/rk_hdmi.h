@@ -14,6 +14,8 @@
 #define HDMI_VIDEO_DVI					(3 << 8)
 #define HDMI_VIC_MASK					(0xFF)
 #define HDMI_TYPE_MASK					(0xFF << 8)
+#define HDMI_MAX_ID	4
+
 
 // HDMI video information code according CEA-861-E
 enum hdmi_video_infomation_code {
@@ -308,7 +310,7 @@ struct hdmi {
 #define HDMI_AUTO_CONFIG		true
 
 // HDMI default vide mode
-#define HDMI_VIDEO_DEFAULT_MODE			HDMI_1920x1080p_60HZ
+#define HDMI_VIDEO_DEFAULT_MODE			HDMI_1280x720p_60HZ//HDMI_1920x1080p_60HZ
 
 // HDMI default audio parameter
 #define HDMI_AUDIO_DEFAULT_TYPE 		HDMI_AUDIO_LPCM
@@ -339,4 +341,6 @@ extern int hdmi_ouputmode_select(struct hdmi *hdmi, int edid_ok);
 extern int hdmi_add_vic(int vic, struct list_head *head);
 extern int hdmi_videomode_to_vic(struct fb_videomode *vmode);
 extern const struct fb_videomode* hdmi_vic_to_videomode(int vic);
+extern int hdmi_config_audio(struct hdmi_audio	*audio);
+
 #endif
