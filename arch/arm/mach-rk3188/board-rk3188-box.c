@@ -404,6 +404,7 @@ static struct sensor_platform_data cm3217_info = {
 static int rk_fb_io_init(struct rk29_fb_setting_info *fb_setting)
 {
 	int ret = 0;
+	int wifi_gpio,wifi_gpio_vule; //add by nition
 
 	if(LCD_CS_PIN !=INVALID_GPIO)
 	{
@@ -434,6 +435,51 @@ static int rk_fb_io_init(struct rk29_fb_setting_info *fb_setting)
 			gpio_direction_output(LCD_EN_PIN, LCD_EN_VALUE);
 		}
 	}
+/***add by nition s at 2013-06-20************/
+#if 1
+	//int ret = 0;
+	ret = gpio_request(RK30_PIN0_PD6, NULL);
+	if (ret != 0) {
+		gpio_free(RK30_PIN0_PD6);
+	}
+	gpio_direction_output(RK30_PIN0_PD6, 1);
+	gpio_set_value(RK30_PIN0_PD6, GPIO_HIGH);
+#endif
+
+#if 0    //wifi test
+printk("**************get wifi_gpio*******************nition\n");
+iomux_set(MMC1_PWREN);
+ wifi_gpio = iomux_mode_to_gpio(MMC1_PWREN);
+//iomux_set_gpio_mode(iomux_mode_to_gpio(MMC1_PWREN));
+	//int ret = 0;
+	//ret = gpio_request(RK30_PIN3_PD0, NULL);
+	ret = gpio_request(wifi_gpio, "wifi_gpio");
+	if (ret != 0) {
+		gpio_free(wifi_gpio);
+		printk("*******************get wifi_gpio error*****************nition\n");
+	}
+	gpio_direction_output(wifi_gpio, 1);
+	gpio_set_value(wifi_gpio, GPIO_HIGH);
+	wifi_gpio_vule=gpio_get_value(wifi_gpio);
+	printk("****************wifi_gpio = %s\n",wifi_gpio_vule);
+#endif
+
+#if 0   //wifi test
+printk("**************get wifi_gpio*******************nition\n");
+gpio_free(RK30_PIN3_PD0);
+	ret = gpio_request(RK30_PIN3_PD0, "wifi_gpio");
+	if (ret != 0) {
+		gpio_free(RK30_PIN3_PD0);
+		printk("*******************get wifi_gpio error*****************nition\n");
+	}
+gpio_direction_output(RK30_PIN3_PD0, 1);
+gpio_set_value(RK30_PIN3_PD0, GPIO_HIGH);
+wifi_gpio_vule=gpio_get_value(RK30_PIN3_PD0);
+printk("****************wifi_gpio = %d\n",wifi_gpio_vule);
+
+#endif
+
+/***add by nition s at 2013-06-20************/
 	return 0;
 }
 static int rk_fb_io_disable(void)
@@ -986,23 +1032,23 @@ static struct rfkill_rk_platform_data rfkill_rk_platdata = {
     .type               = RFKILL_TYPE_BLUETOOTH,
 
     .poweron_gpio       = { // BT_REG_ON
-        .io             = RK30_PIN3_PD1, //RK30_PIN3_PC7,
+        .io             = INVALID_GPIO, //RK30_PIN3_PD0,//INVALID_GPIO, //RK30_PIN3_PC7,
         .enable         = GPIO_HIGH,
     },
 
     .reset_gpio         = { // BT_RST
-        .io             = INVALID_GPIO, // set io to INVALID_GPIO for disable it
-        .enable         = GPIO_LOW,
+        .io             = RK30_PIN3_PD1, // set io to INVALID_GPIO for disable it
+        .enable         = GPIO_HIGH,//GPIO_LOW,
    }, 
 
     .wake_gpio          = { // BT_WAKE, use to control bt's sleep and wakeup
-        .io             = RK30_PIN3_PC6, // set io to INVALID_GPIO for disable it
+        .io             = RK30_PIN3_PC7, // set io to INVALID_GPIO for disable it
         .enable         = GPIO_HIGH,
     },
 
     .wake_host_irq      = { // BT_HOST_WAKE, for bt wakeup host when it is in deep sleep
         .gpio           = {
-            .io         = RK30_PIN0_PA5, // set io to INVALID_GPIO for disable it
+            .io         = RK30_PIN3_PC6, // set io to INVALID_GPIO for disable it
             .enable     = GPIO_LOW,      // set GPIO_LOW for falling, set 0 for rising
             .iomux      = {
                 .name   = NULL,
@@ -1011,7 +1057,7 @@ static struct rfkill_rk_platform_data rfkill_rk_platdata = {
     },
 
     .rts_gpio           = { // UART_RTS, enable or disable BT's data coming
-        .io             = RK30_PIN1_PA3, // set io to INVALID_GPIO for disable it
+        .io             = INVALID_GPIO, // set io to INVALID_GPIO for disable it
         .enable         = GPIO_LOW,
         .iomux          = {
             .name       = "bt_rts",
@@ -1847,6 +1893,13 @@ static struct i2c_board_info __initdata i2c4_info[] = {
 		.flags          = 0,
     },
 #endif
+#endif
+#if defined (CONFIG_SND_SOC_RT5616)
+        {
+                .type                   = "rt5616",
+                .addr                   = 0x1b,
+                .flags                  = 0,
+        },
 #endif
 //$_rbox_$_modify_$ zhengyang modified end
 };

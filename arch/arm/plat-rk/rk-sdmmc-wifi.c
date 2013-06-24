@@ -32,7 +32,7 @@ int rk29sdk_bt_power_state = 0;
 	    #define USE_SDMMC_CONTROLLER_FOR_WIFI   0
    		#define COMBO_MODULE_MT6620_CDT         0  //- 1--use Cdtech chip; 0--unuse CDT chip
         //power
-        #define RK30SDK_WIFI_GPIO_POWER_N                   RK30_PIN3_PD0            
+        #define RK30SDK_WIFI_GPIO_POWER_N                   RK30_PIN3_PA0//RK30_PIN3_PD0     modify by nition       
         #define RK30SDK_WIFI_GPIO_POWER_ENABLE_VALUE        GPIO_HIGH        
         #define RK30SDK_WIFI_GPIO_POWER_PIN_NAME            GPIO3D0_SDMMC1PWREN_NAME
         #define RK30SDK_WIFI_GPIO_POWER_IOMUX_FGPIO         GPIO3D_GPIO3D0
@@ -93,11 +93,15 @@ static int rk29sdk_wifi_cd = 0;   /* wifi virtual 'card detect' status */
 static void (*wifi_status_cb)(int card_present, void *dev_id);
 static void *wifi_status_cb_devid;
 
-#if defined(CONFIG_RK29_SDIO_IRQ_FROM_GPIO)
+#if defined(CONFIG_RK29_SDIO_IRQ_FROM_GPIO) //add by nition
 #define RK29SDK_WIFI_SDIO_CARD_INT         RK30SDK_WIFI_GPIO_WIFI_INT_B
 #endif
 
+
+
+
 struct rksdmmc_gpio_wifi_moudle  rk_platform_wifi_gpio = {
+#if defined(CONFIG_USE_SDMMC0_FOR_WIFI_DEVELOP_BOARD)
     .power_n = {
             .io             = RK30SDK_WIFI_GPIO_POWER_N, 
             .enable         = RK30SDK_WIFI_GPIO_POWER_ENABLE_VALUE,
@@ -241,6 +245,8 @@ struct rksdmmc_gpio_wifi_moudle  rk_platform_wifi_gpio = {
     },
     #endif
 #endif // #if COMBO_MODULE_MT6620_CDT--#endif   
+
+#endif  //add by nition
 };
 
 

@@ -434,7 +434,7 @@ static int act8846_dcdc_set_voltage_time_sel(struct regulator_dev *dev,   unsign
 				     unsigned int new_selector)
 {
 	struct act8846 *act8846 = rdev_get_drvdata(dev);
-	int ret =0,old_volt, new_volt;
+	int old_volt, new_volt;//ret =0,  remove ret
 	
 	old_volt = act8846_dcdc_list_voltage(dev, old_selector);
 	if (old_volt < 0)
@@ -723,14 +723,58 @@ __weak void  act8846_device_suspend(void) {}
 __weak void  act8846_device_resume(void) {}
 #ifdef CONFIG_PM
 static int act8846_suspend(struct i2c_client *i2c, pm_message_t mesg)
-{		
-	act8846_device_suspend();
+{	
+/****add by nition at 20130527 s********************/	
+#if 0
+	int ret,k=10;	
+       u16 val = 0;//add by nition 
+      struct act8846 *act8846 = g_act8846;
+//	ret = act8846_set_bits(act8846, 0xe4,(0x1<<7),(0x0<<7));
+	val=0xf;
+	ret = act8846_i2c_write(act8846->i2c, 0xe4, 1, val);
+	printk("act8846_i2c_write ret =%d ***********sleep\n",ret);
+	while(ret<0){
+		ret = act8846_i2c_write(act8846->i2c, 0xe4, 1, val);
+		if(ret>0)break;
+		k--;
+		if(k<0){
+			printk("act8846_i2c_write error -----sleep nition\n");
+			break;}
+		}
+	act8846_i2c_read(act8846->i2c, 0xe4, 1, &val);
+	printk("act8846_suspend 0xe4 = %d******************nition\n",val);
+#endif
+/****add by nition at 20130527 e********************/
+act8846_device_suspend();
 	return 0;
 }
 
 static int act8846_resume(struct i2c_client *i2c)
 {
+/****add by nition at 20130527 s********************/	
+#if 0
+	int ret,k=10;	
+       u16 val = 0;//add by nition 
+       struct act8846 *act8846 = g_act8846;
+	//ret = act8846_set_bits(act8846, 0xe4,(0x1<<7),(0x1<<7));
+	val=0x8f;
+	ret = act8846_i2c_write(act8846->i2c, 0xe4, 1, val);	
+	printk("act8846_i2c_write ret =%d  ***********wakeup\n",ret);
+	while(ret<0){
+		ret = act8846_i2c_write(act8846->i2c, 0xe4, 1, val);	
+		if(ret>0)break;
+		k--;
+		if(k<0){
+			printk("act8846_i2c_write error -----wakeup nition\n");
+			break;
+			}
+	}	
+	act8846_i2c_read(act8846->i2c, 0xe4, 1, &val);
+	printk("act8846_resume 0xe4 = %d******************nition\n",val);
+#endif
+/****add by nition at 20130527 e********************/	
 	act8846_device_resume();
+
 	return 0;
 }
 #else
@@ -756,6 +800,7 @@ static int __devinit act8846_i2c_probe(struct i2c_client *i2c, const struct i2c_
 	struct act8846 *act8846;	
 	struct act8846_platform_data *pdata = i2c->dev.platform_data;
 	int ret;
+	u16 val = 0;//add by nition 
 	act8846 = kzalloc(sizeof(struct act8846), GFP_KERNEL);
 	if (act8846 == NULL) {
 		ret = -ENOMEM;		
@@ -794,7 +839,14 @@ static int __devinit act8846_i2c_probe(struct i2c_client *i2c, const struct i2c_
 	act8846->act8846_suspend.level = EARLY_SUSPEND_LEVEL_DISABLE_FB + 1,
 	register_early_suspend(&act8846->act8846_suspend);
 	#endif
-	
+/****add by nition at 20130527 s********************/	
+	act8846_i2c_read(act8846->i2c, 0xe4, 1, &val);
+	printk("act8846 0xe4 = %d******************nition-1\n",val);
+	val=0x8f;
+	ret = act8846_i2c_write(act8846->i2c, 0xe4, 1, val);
+	act8846_i2c_read(act8846->i2c, 0xe4, 1, &val);
+	printk("act8846 0xe4 = %d******************nition-2\n",val);
+/****add by nition at 20130527 e********************/	
 	return 0;
 
 err:

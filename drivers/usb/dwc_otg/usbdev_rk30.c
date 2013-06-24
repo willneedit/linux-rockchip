@@ -29,7 +29,7 @@
 #define RK3066B_OTG_DRV_VBUS  RK30_PIN0_PD6
 #elif defined(CONFIG_SOC_RK3168) || defined(CONFIG_ARCH_RK3188) 
 #define RK3066B_HOST_DRV_VBUS RK30_PIN0_PA3
-#define RK3066B_OTG_DRV_VBUS  RK30_PIN3_PD5
+#define RK3066B_OTG_DRV_VBUS  RK30_PIN0_PA5//RK30_PIN3_PD5
 
 #endif
 
@@ -124,7 +124,9 @@ void usb20otg_hw_init(void)
 #if defined(CONFIG_ARCH_RK3066B) || defined(CONFIG_ARCH_RK3188)
         //GPIO init
         gpio_request(RK3066B_OTG_DRV_VBUS, NULL);
-        gpio_direction_output(RK3066B_OTG_DRV_VBUS, GPIO_LOW);
+        gpio_direction_output(RK3066B_OTG_DRV_VBUS, GPIO_HIGH);//GPIO_LOW
+       // gpio_request(RK30_PIN0_PA5, NULL);
+       // gpio_direction_output(RK30_PIN0_PA5, 1);
 #else
         rk30_mux_api_set(GPIO0A5_OTGDRVVBUS_NAME, GPIO0A_OTG_DRV_VBUS);
 #endif
@@ -317,6 +319,11 @@ void usb20host_hw_init(void)
 #if defined(CONFIG_ARCH_RK3066B) || defined(CONFIG_ARCH_RK3188)
     gpio_request(RK3066B_HOST_DRV_VBUS, NULL);
     gpio_direction_output(RK3066B_HOST_DRV_VBUS, GPIO_HIGH);
+
+/****modify by nition at 20130422 s*****************/
+  gpio_request(RK30_PIN0_PD5, NULL);    //pull high of hub reset pin
+  gpio_direction_output(RK30_PIN0_PD5, GPIO_HIGH);
+/****modify by nition at 20130422 e*****************/
 #else
     rk30_mux_api_set(GPIO0A6_HOSTDRVVBUS_NAME, GPIO0A_HOST_DRV_VBUS);
 #endif

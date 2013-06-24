@@ -41,12 +41,12 @@ module_param(dbg_thresd, int, S_IRUGO|S_IWUSR);
 	if(unlikely(dbg_thresd >= level)) 	\
 		printk(KERN_INFO x);} while (0)
 
+
 //#define WAIT_FOR_SYNC 1
 
 static int rk3188_load_screen(struct rk_lcdc_device_driver *dev_drv, bool initscreen);
 static int  rk3188_lcdc_clk_enable(struct rk3188_lcdc_device *lcdc_dev)
 {
-
 	clk_enable(lcdc_dev->hclk);
 	clk_enable(lcdc_dev->dclk);
 	clk_enable(lcdc_dev->aclk);

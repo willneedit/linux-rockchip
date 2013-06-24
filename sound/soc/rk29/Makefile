@@ -30,6 +30,7 @@ snd-soc-cs42l52-objs := rk29_cs42l52.o
 snd-soc-aic3111-objs := rk29_aic3111.o
 snd-soc-wm8988-objs := rk29_wm8988.o
 snd-soc-rk1000-objs := rk29_rk1000codec.o
+snd-soc-rt5616-objs := rk29_rt5616.o
 snd-soc-wm8994-objs := rk29_wm8994.o
 ##$_rbox_$_modify_$_zhengyang
 snd-soc-hdmi-objs := rockchip-hdmi-card.o
@@ -50,6 +51,7 @@ obj-$(CONFIG_SND_RK29_SOC_RT5625) += snd-soc-rt5625.o
 obj-$(CONFIG_SND_RK29_SOC_RT3261) += snd-soc-rt3261.o
 obj-$(CONFIG_SND_RK29_SOC_RT3224) += snd-soc-rt3224.o
 obj-$(CONFIG_SND_RK29_SOC_RK1000) += snd-soc-rk1000.o
+obj-$(CONFIG_SND_RK29_SOC_RT5616) += snd-soc-rt5616.o
 obj-$(CONFIG_SND_RK29_SOC_CS42L52) += snd-soc-cs42l52.o
 obj-$(CONFIG_SND_RK29_SOC_AIC3111) += snd-soc-aic3111.o
 obj-$(CONFIG_SND_RK29_SOC_AIC3262) += snd-soc-aic3262.o
