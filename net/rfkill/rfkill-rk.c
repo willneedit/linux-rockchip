@@ -121,21 +121,21 @@ static const char bt_name[] =
         "mv8787"
 #elif defined(CONFIG_AP6210)
         "ap6210"
-<<<<<<< HEAD
-#elif defined(CONFIG_AP6330_4_1)
-=======
+//<<<<<<< HEAD
+//#elif defined(CONFIG_AP6330_4_1)
+//=======
 #elif defined(CONFIG_AP6330)
->>>>>>> 3f729bb3ab6fd459980b5a4ddbad0514c2add833
+//>>>>>>> 3f729bb3ab6fd459980b5a4ddbad0514c2add833
 		"ap6330"
 #elif defined(CONFIG_AP6476)
 		"ap6476"
 #elif defined(CONFIG_AP6493)
 		"ap6493"
-<<<<<<< HEAD
-#elif defined(CONFIG_GB86302I)
-	"gb86302i"
-=======
->>>>>>> 3f729bb3ab6fd459980b5a4ddbad0514c2add833
+//<<<<<<< HEAD
+//#elif defined(CONFIG_GB86302I)
+//	"gb86302i"
+//=======
+//>>>>>>> 3f729bb3ab6fd459980b5a4ddbad0514c2add833
 #else
         "bt_default"
 #endif
@@ -297,14 +297,14 @@ static int rfkill_rk_set_power(void *data, bool blocked)
 	struct rfkill_rk_data *rfkill = data;
     struct rfkill_rk_gpio *poweron = &rfkill->pdata->poweron_gpio;
     struct rfkill_rk_gpio *reset = &rfkill->pdata->reset_gpio;
-<<<<<<< HEAD
-#if defined(CONFIG_AP6210)
-    struct rfkill_rk_gpio* rts = &rfkill->pdata->rts_gpio;
-#endif
-=======
+//<<<<<<< HEAD
+//#if defined(CONFIG_AP6210)
+//    struct rfkill_rk_gpio* rts = &rfkill->pdata->rts_gpio;
+//#endif
+//=======
     struct rfkill_rk_gpio* rts = &rfkill->pdata->rts_gpio;
 
->>>>>>> 3f729bb3ab6fd459980b5a4ddbad0514c2add833
+//>>>>>>> 3f729bb3ab6fd459980b5a4ddbad0514c2add833
     DBG("Enter %s\n", __func__);
 
     DBG("Set blocked:%d\n", blocked);
