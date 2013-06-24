@@ -1032,23 +1032,48 @@ static struct rfkill_rk_platform_data rfkill_rk_platdata = {
     .type               = RFKILL_TYPE_BLUETOOTH,
 
     .poweron_gpio       = { // BT_REG_ON
+<<<<<<< HEAD
         .io             = INVALID_GPIO, //RK30_PIN3_PD0,//INVALID_GPIO, //RK30_PIN3_PC7,
+=======
+        .io             = RK30_PIN3_PC7, //RK30_PIN3_PC7,
+>>>>>>> 3f729bb3ab6fd459980b5a4ddbad0514c2add833
         .enable         = GPIO_HIGH,
+        .iomux          = {
+            .name       = "bt_poweron",
+            .fgpio      = GPIO3_C7,
+        },
     },
 
     .reset_gpio         = { // BT_RST
         .io             = RK30_PIN3_PD1, // set io to INVALID_GPIO for disable it
+<<<<<<< HEAD
         .enable         = GPIO_HIGH,//GPIO_LOW,
    }, 
+=======
+        .enable         = GPIO_LOW,
+        .iomux          = {
+            .name       = "bt_reset",
+            .fgpio      = GPIO3_D1,
+       },
+    },
+>>>>>>> 3f729bb3ab6fd459980b5a4ddbad0514c2add833
 
     .wake_gpio          = { // BT_WAKE, use to control bt's sleep and wakeup
         .io             = RK30_PIN3_PC7, // set io to INVALID_GPIO for disable it
         .enable         = GPIO_HIGH,
+        .iomux          = {
+            .name       = "bt_wake",
+            .fgpio      = GPIO3_C6,
+        },
     },
 
     .wake_host_irq      = { // BT_HOST_WAKE, for bt wakeup host when it is in deep sleep
         .gpio           = {
+<<<<<<< HEAD
             .io         = RK30_PIN3_PC6, // set io to INVALID_GPIO for disable it
+=======
+            .io         = RK30_PIN3_PD2, // set io to INVALID_GPIO for disable it
+>>>>>>> 3f729bb3ab6fd459980b5a4ddbad0514c2add833
             .enable     = GPIO_LOW,      // set GPIO_LOW for falling, set 0 for rising
             .iomux      = {
                 .name   = NULL,

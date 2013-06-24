@@ -269,6 +269,7 @@ static int mtd_blktrans_thread(void *arg)
 	
     set_user_nice(current,-20);
 	spin_lock_irq(rq->queue_lock);
+<<<<<<< HEAD
 
 	while (!kthread_should_stop()) {
 		int res;
@@ -290,6 +291,29 @@ static int mtd_blktrans_thread(void *arg)
 			}
 			set_current_state(TASK_INTERRUPTIBLE);
 
+=======
+
+	while (!kthread_should_stop()) {
+		int res;
+
+		dev->bg_stop = false;
+		if (!req && !(req = blk_fetch_request(rq))) {
+			if (tr->background && !background_done) {
+				spin_unlock_irq(rq->queue_lock);
+				mutex_lock(&dev->lock);
+				tr->background(dev);
+				mutex_unlock(&dev->lock);
+				spin_lock_irq(rq->queue_lock);
+				/*
+				 * Do background processing just once per idle
+				 * period.
+				 */
+				background_done = !dev->bg_stop;
+				continue;
+			}
+			set_current_state(TASK_INTERRUPTIBLE);
+
+>>>>>>> 3f729bb3ab6fd459980b5a4ddbad0514c2add833
 			if (kthread_should_stop())
 				set_current_state(TASK_RUNNING);
 
