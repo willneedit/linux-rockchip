@@ -22,7 +22,7 @@
 #endif
 
 static int nologo;
-module_param(nologo, bool, 0);
+module_param(nologo, bool, 1);//2013.6.24.zengjy. remove linux logo module_param(nologo, bool, 0);
 MODULE_PARM_DESC(nologo, "Disables startup logo");
 
 extern const struct linux_logo logo_cruz_clut224;
@@ -46,6 +46,7 @@ const struct linux_logo * __init_refok fb_find_logo(int depth)
 {
         struct linux_logo *logo = NULL;
 	const struct linux_logo *m_logo = NULL;
+	nologo = 1; //2013.6.18.zengjy.remove linux bootup logo
 	if (nologo)
 		return NULL;
 

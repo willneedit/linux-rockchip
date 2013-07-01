@@ -145,7 +145,21 @@ static struct rkxx_remote_key_table remote_key_table_df[] = {
     {0x50, KEY_POWER},     //power off
     {0x40, KEY_SEARCH},     //search
 };
-
+//2013.4.26.zengjy.key_remote_control
+	static struct rkxx_remote_key_table remote_key_table_hs[] = {
+    {0xE7, KEY_POWER},
+    {0xF7, KEY_VOLUMEDOWN}, 
+    {0xD7, KEY_VOLUMEUP},
+    {0xDF, KEY_MENU},      
+    {0x9D, KEY_UP},  
+    {0x97, KEY_DOWN},  
+    {0x1D, KEY_LEFT},  
+    {0x57, KEY_RIGHT},  
+    {0x55, KEY_ENTER},  
+    {0xFD, KEY_BACK},  
+    {0x4F, KEY_HOME},  
+};
+//2013.4.26.zengjy.key_remote_control
 //neildebug_s
 static struct rkxx_remote_key_table remote_key_table_minix[] = {
 /*
@@ -267,6 +281,13 @@ static struct rkxx_remotectl_button remotectl_button[] =
     }, 
  	
 //neildebug_e
+	   	//2013.4.26.zengjy.key
+  {  
+       .usercode = 0x807F, 
+       .nbuttons =  11, 
+       .key_table = &remote_key_table_hs[0],
+    },
+    //2013.4.26.zengjy.key
 };
 
 
@@ -374,7 +395,7 @@ static void remotectl_do_something(unsigned long  data)
             }           
             if (ddata->count == 0x10){
 //neilnee_20120115_s
-				if (ddata->keybdNum == 4)
+				if (ddata->keybdNum == 4 || ddata->keybdNum == 5)
 				{
 					ddata->scanData = (ddata->scanData&0x0ff) << 8;
 					ddata->scanData |= ((~ddata->scanData >> 8)&0x0ff);
