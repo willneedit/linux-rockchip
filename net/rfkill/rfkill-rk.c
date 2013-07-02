@@ -43,7 +43,7 @@
 #include <asm/irq.h>
 #include <linux/suspend.h>
 
-#if 0
+#if 1
 #define DBG(x...)   printk(KERN_INFO "[BT_RFKILL]: "x)
 #else
 #define DBG(x...)
@@ -168,6 +168,7 @@ static irqreturn_t rfkill_rk_wake_host_irq(int irq, void *dev)
  */
 static int rfkill_rk_setup_gpio(struct rfkill_rk_gpio* gpio, int mux, const char* prefix, const char* name)
 {
+#if 0 //original
 	if (gpio_is_valid(gpio->io)) {
         int ret=0;
         sprintf(gpio->name, "%s_%s", prefix, name);
@@ -186,7 +187,28 @@ static int rfkill_rk_setup_gpio(struct rfkill_rk_gpio* gpio, int mux, const char
                 ;// do nothing
         }
 	}
-
+#else  //modify by nition
+	if (gpio_is_valid(gpio->io)) {
+        int ret=0;
+			
+        sprintf(gpio->name, "%s_%s", prefix, name);
+		ret = gpio_request(gpio->io, gpio->name);
+		if (ret) {
+			LOG("Failed to get %s gpio.\n", gpio->name);
+			return -1;
+		}
+		
+        if (gpio->iomux.name)
+        {
+            if (mux==1)
+                iomux_set(gpio->iomux.fgpio);
+            else if (mux==2)
+                iomux_set(gpio->iomux.fmux);
+            else
+         ;// do nothing
+	} 
+}
+#endif
     return 0;
 }
 
@@ -308,7 +330,7 @@ static int rfkill_rk_set_power(void *data, bool blocked)
     DBG("Enter %s\n", __func__);
 
     DBG("Set blocked:%d\n", blocked);
-
+//printk("*******rfkill_rk_set_power blocked=%d**********nition\n",blocked);// add by nition
 	if (false == blocked) { 
         rfkill_rk_sleep_bt(BT_WAKEUP); // ensure bt is wakeup
 
@@ -492,8 +514,8 @@ static int rfkill_rk_probe(struct platform_device *pdev)
     // 对于RK29 BCM4329，它的poweron io与wifi共用，在boad文件中已经request
     // 此处不用去申请
 #if !WIFI_BT_POWER_TOGGLE
-    ret = rfkill_rk_setup_gpio(&pdata->poweron_gpio, IOMUX_FGPIO, pdata->name, "poweron");
-    if (ret) goto fail_alloc;
+    ret = rfkill_rk_setup_gpio(&pdata->poweron_gpio, IOMUX_FGPIO, pdata->name, "poweron");  //modify by nition
+    if (ret) goto fail_alloc;   //modify by nition
 #endif
 
     ret = rfkill_rk_setup_gpio(&pdata->reset_gpio, IOMUX_FGPIO, pdata->name, "reset");

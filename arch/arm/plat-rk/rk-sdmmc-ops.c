@@ -96,7 +96,7 @@ static struct rksdmmc_gpio_board rksdmmc0_gpio_init = {
     },   
 
     .cmd_gpio           = {
-        .io             = RK30_PIN3_PA3,
+        .io             =RK30_PIN3_PA3,
         .enable         = GPIO_HIGH,
         .iomux          = {
             .name       = "mmc0_cmd",
@@ -628,6 +628,8 @@ static struct rksdmmc_gpio_board rksdmmc1_gpio_init = {
 #if !defined(CONFIG_SDMMC_RK29_OLD)	
 static void rk29_sdmmc_gpio_open(int device_id, int on)
 {
+   printk("********rk29_sdmmc_gpio_open device_id=%d**********nition\n",device_id);// add by nition
+   
     switch(device_id)
     {
         case 0://mmc0
@@ -693,6 +695,50 @@ static void rk29_sdmmc_gpio_open(int device_id, int on)
             #ifdef CONFIG_SDMMC1_RK29
             if(on)
             {
+                /******modify by nition s**************/
+				printk("********************rksdmmc1_gpio_init------on************nition\n");
+				//iomux_set(RK30_PIN3_PC5);
+				//gpio_direction_output(rksdmmc1_gpio_init.cmd_gpio.io,GPIO_HIGH);//set mmc1-cmd to high.
+                          //  gpio_pull_updown(RK30_PIN3_PC5, 1);
+				//iomux_set(rksdmmc1_gpio_init.cmd_gpio.iomux.fmux);        
+
+ #if 0
+ 		    iomux_set(rksdmmc1_gpio_init.cmd_gpio.iomux.fgpio);
+   		   iomux_set(rksdmmc1_gpio_init.clk_gpio.iomux.fgpio);
+                 iomux_set(rksdmmc1_gpio_init.data0_gpio.iomux.fgpio);
+                 iomux_set(rksdmmc1_gpio_init.data1_gpio.iomux.fgpio);
+                 iomux_set(rksdmmc1_gpio_init.data2_gpio.iomux.fgpio);
+                 iomux_set(rksdmmc1_gpio_init.data3_gpio.iomux.fgpio);
+
+		gpio_request(rksdmmc1_gpio_init.clk_gpio.io,NULL);
+		gpio_request(rksdmmc1_gpio_init.cmd_gpio.io,NULL);
+		gpio_request(rksdmmc1_gpio_init.data0_gpio.io,NULL);
+		gpio_request(rksdmmc1_gpio_init.data1_gpio.io,NULL);
+		gpio_request(rksdmmc1_gpio_init.data2_gpio.io,NULL);
+		gpio_request(rksdmmc1_gpio_init.data3_gpio.io,NULL);
+		#if 1		
+	        gpio_pull_updown(rksdmmc1_gpio_init.clk_gpio.io,GPIO_HIGH);//set mmc1-clk to high GPIO_HIGH
+                gpio_pull_updown(rksdmmc1_gpio_init.cmd_gpio.io,GPIO_HIGH);//set mmc1-cmd to high.
+                gpio_pull_updown(rksdmmc1_gpio_init.data0_gpio.io,GPIO_HIGH);//set mmc1-data0 to high.
+                gpio_pull_updown(rksdmmc1_gpio_init.data1_gpio.io,GPIO_HIGH);//set mmc1-data1 to high.
+                gpio_pull_updown(rksdmmc1_gpio_init.data2_gpio.io,GPIO_HIGH);//set mmc1-data2 to high.
+               gpio_pull_updown(rksdmmc1_gpio_init.data3_gpio.io,GPIO_HIGH);//set mmc1-data3 to high.
+			  // printk("wax->%d\n",__LINE__); 
+              #else
+                gpio_direction_output(rksdmmc1_gpio_init.clk_gpio.io,GPIO_LOW);//set mmc1-clk to high
+                gpio_direction_output(rksdmmc1_gpio_init.cmd_gpio.io,GPIO_LOW);//set mmc1-cmd to high.
+                gpio_direction_output(rksdmmc1_gpio_init.data0_gpio.io,GPIO_LOW);//set mmc1-data0 to high.
+                gpio_direction_output(rksdmmc1_gpio_init.data1_gpio.io,GPIO_LOW);//set mmc1-data1 to high.
+                gpio_direction_output(rksdmmc1_gpio_init.data2_gpio.io,GPIO_LOW);//set mmc1-data2 to high.
+                gpio_direction_output(rksdmmc1_gpio_init.data3_gpio.io,GPIO_LOW);//set mmc1-data3 to high.
+		#endif
+	          iomux_set(rksdmmc1_gpio_init.cmd_gpio.iomux.fmux);
+   		   iomux_set(rksdmmc1_gpio_init.clk_gpio.iomux.fmux);
+                 iomux_set(rksdmmc1_gpio_init.data0_gpio.iomux.fmux);
+                 iomux_set(rksdmmc1_gpio_init.data1_gpio.iomux.fmux);
+                 iomux_set(rksdmmc1_gpio_init.data2_gpio.iomux.fmux);
+                 iomux_set(rksdmmc1_gpio_init.data3_gpio.iomux.fmux);
+#else          //original
                 gpio_direction_output(rksdmmc1_gpio_init.clk_gpio.io,GPIO_HIGH);//set mmc1-clk to high
                 gpio_direction_output(rksdmmc1_gpio_init.cmd_gpio.io,GPIO_HIGH);//set mmc1-cmd to high.
                 gpio_direction_output(rksdmmc1_gpio_init.data0_gpio.io,GPIO_HIGH);//set mmc1-data0 to high.
@@ -700,9 +746,13 @@ static void rk29_sdmmc_gpio_open(int device_id, int on)
                 gpio_direction_output(rksdmmc1_gpio_init.data2_gpio.io,GPIO_HIGH);//set mmc1-data2 to high.
                 gpio_direction_output(rksdmmc1_gpio_init.data3_gpio.io,GPIO_HIGH);//set mmc1-data3 to high.
                 mdelay(100);
+#endif
+		   /******modify by nition e**************/
             }
             else
             {
+            printk("********************rksdmmc1_gpio_init-------off************nition\n");
+   #if 1  //original
                 #if !(!!SDMMC_USE_NEW_IOMUX_API)
                 rk30_mux_api_set(rksdmmc1_gpio_init.clk_gpio.iomux.name, rksdmmc1_gpio_init.clk_gpio.iomux.fgpio);
                 #endif
@@ -740,7 +790,23 @@ static void rk29_sdmmc_gpio_open(int device_id, int on)
                 gpio_request(rksdmmc1_gpio_init.data3_gpio.io, "mmc1-data3");
                 gpio_direction_output(rksdmmc1_gpio_init.data3_gpio.io,GPIO_LOW);//set mmc1-data3 to low.
            #endif
+#else   //modify by nition
+            //    gpio_direction_output(rksdmmc1_gpio_init.clk_gpio.io,GPIO_LOW);//set mmc1-clk to high
+            //    gpio_direction_output(rksdmmc1_gpio_init.cmd_gpio.io,GPIO_LOW);//set mmc1-cmd to high.
+           //     gpio_direction_output(rksdmmc1_gpio_init.data0_gpio.io,GPIO_LOW);//set mmc1-data0 to high.
+            //    gpio_direction_output(rksdmmc1_gpio_init.data1_gpio.io,GPIO_LOW);//set mmc1-data1 to high.
+            //    gpio_direction_output(rksdmmc1_gpio_init.data2_gpio.io,GPIO_LOW);//set mmc1-data2 to high.
+            //    gpio_direction_output(rksdmmc1_gpio_init.data3_gpio.io,GPIO_LOW);//set mmc1-data3 to high.     
+
+                gpio_pull_updown(rksdmmc1_gpio_init.clk_gpio.io,GPIO_LOW);//set mmc1-clk to high GPIO_HIGH
+                gpio_pull_updown(rksdmmc1_gpio_init.cmd_gpio.io,GPIO_LOW);//set mmc1-cmd to high.
+                gpio_pull_updown(rksdmmc1_gpio_init.data0_gpio.io,GPIO_LOW);//set mmc1-data0 to high.
+                gpio_pull_updown(rksdmmc1_gpio_init.data1_gpio.io,GPIO_LOW);//set mmc1-data1 to high.
+                gpio_pull_updown(rksdmmc1_gpio_init.data2_gpio.io,GPIO_LOW);//set mmc1-data2 to high.
+               gpio_pull_updown(rksdmmc1_gpio_init.data3_gpio.io,GPIO_LOW);//set mmc1-data3 to high.
+#endif
                 mdelay(100);
+ 
             }
             #endif
         }
@@ -847,6 +913,7 @@ static void rk29_sdmmc_set_iomux_mmc0(unsigned int bus_width)
 
 static void rk29_sdmmc_set_iomux_mmc1(unsigned int bus_width)
 {
+  printk("rk29_sdmmc_set_iomux_mmc1************************nition\n"); //add by nition
     #if SDMMC_USE_NEW_IOMUX_API
     iomux_set(rksdmmc1_gpio_init.cmd_gpio.iomux.fmux);
     iomux_set(rksdmmc1_gpio_init.clk_gpio.iomux.fmux);

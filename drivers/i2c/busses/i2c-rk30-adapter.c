@@ -117,12 +117,16 @@ static int rk30_i2c_check_idle(struct rk30_i2c *i2c)
 	sda_io = iomux_mode_to_gpio(i2c->sda_mode);
 	scl_io = iomux_mode_to_gpio(i2c->scl_mode);
 
-	ret = gpio_request(sda_io, NULL);
+printk("wax->sda_io=%d scl_io=%d$$$$$$$$$$$$$$$$$$$$$\n",sda_io,scl_io);
+printk("wax->sda_io=%d scl_io=%d$$$$$$$$$$$$$$$$$$$$$\n",sda_io,scl_io);
+       if(218==sda_io||219==sda_io)
+       return I2C_IDLE;
+	ret = gpio_request(sda_io, NULL);  //modify by nition
 	if(unlikely(ret < 0)){
 		dev_err(i2c->dev, "Failed to request gpio: SDA_GPIO\n");
 		return ret;
 	}
-	ret = gpio_request(scl_io, NULL);
+	ret = gpio_request(scl_io, NULL); //modify by nition
 	if(unlikely(ret < 0)){
 		dev_err(i2c->dev, "Failed to request gpio: SCL_GPIO\n");
 		gpio_free(sda_io);
@@ -585,10 +589,15 @@ static int rk30_i2c_xfer(struct i2c_adapter *adap,
 
         clk_enable(i2c->clk);
 #ifdef I2C_CHECK_IDLE
+printk("wax->%d\n",__LINE__);  //add by nition for test
         while(retry-- && ((state = rk30_i2c_check_idle(i2c)) != I2C_IDLE)){
+printk("wax->%d\n",__LINE__); //add by nition for test
                 msleep(10);
+printk("wax->%d\n",__LINE__); //add by nition for test
         }
+printk("wax->%d\n",__LINE__); //add by nition for test
         if(retry == 0){
+printk("wax->%d\n",__LINE__); //add by nition for test
                 dev_err(i2c->dev, "i2c is not in idle(state = %d)\n", state);
                 return -EIO;
         }

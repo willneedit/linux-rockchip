@@ -398,7 +398,7 @@ static struct sensor_platform_data cm3217_info = {
 #define LCD_CS_PIN         INVALID_GPIO
 #define LCD_CS_VALUE       GPIO_HIGH
 
-#define LCD_EN_PIN         RK30_PIN0_PB0
+#define LCD_EN_PIN         INVALID_GPIO//RK30_PIN0_PB0
 #define LCD_EN_VALUE       GPIO_LOW
 
 static int rk_fb_io_init(struct rk29_fb_setting_info *fb_setting)
@@ -436,7 +436,7 @@ static int rk_fb_io_init(struct rk29_fb_setting_info *fb_setting)
 		}
 	}
 /***add by nition s at 2013-06-20************/
-#if 1
+#if 1    // eth
 	//int ret = 0;
 	ret = gpio_request(RK30_PIN0_PD6, NULL);
 	if (ret != 0) {
@@ -478,6 +478,8 @@ wifi_gpio_vule=gpio_get_value(RK30_PIN3_PD0);
 printk("****************wifi_gpio = %d\n",wifi_gpio_vule);
 
 #endif
+//iomux_set(GPIO3_D0);
+//gpio_pull_updown(RK30_PIN3_PD0, 1);
 
 /***add by nition s at 2013-06-20************/
 	return 0;
@@ -1032,17 +1034,17 @@ static struct rfkill_rk_platform_data rfkill_rk_platdata = {
     .type               = RFKILL_TYPE_BLUETOOTH,
 
     .poweron_gpio       = { // BT_REG_ON
-        //.io             = INVALID_GPIO, //RK30_PIN3_PD0,//INVALID_GPIO, //RK30_PIN3_PC7,
-        .io             = RK30_PIN3_PC7, //RK30_PIN3_PC7,
+        .io             = INVALID_GPIO, //RK30_PIN3_PD0,//INVALID_GPIO, //RK30_PIN3_PC7,
+       // .io             = RK30_PIN3_PC7, //RK30_PIN3_PC7,
         .enable         = GPIO_HIGH,
         .iomux          = {
             .name       = "bt_poweron",
-            .fgpio      = GPIO3_C7,
+            .fgpio      = GPIO3_D0,
         },
     },
 
     .reset_gpio         = { // BT_RST
-        .io             = RK30_PIN3_PD1, // set io to INVALID_GPIO for disable it
+        .io             = RK30_PIN3_PD1,//RK30_PIN3_PD1, // set io to INVALID_GPIO for disable it
         .enable         = GPIO_LOW,
         .iomux          = {
             .name       = "bt_reset",
@@ -1055,17 +1057,18 @@ static struct rfkill_rk_platform_data rfkill_rk_platdata = {
         .enable         = GPIO_HIGH,
         .iomux          = {
             .name       = "bt_wake",
-            .fgpio      = GPIO3_C6,
+            .fgpio      = GPIO3_C7,
         },
     },
 
     .wake_host_irq      = { // BT_HOST_WAKE, for bt wakeup host when it is in deep sleep
         .gpio           = {
-            //.io         = RK30_PIN3_PC6, // set io to INVALID_GPIO for disable it
-            .io         = RK30_PIN3_PD2, // set io to INVALID_GPIO for disable it
+            .io         = RK30_PIN3_PC6, // set io to INVALID_GPIO for disable it
+          //  .io         = RK30_PIN3_PD2, // set io to INVALID_GPIO for disable it
             .enable     = GPIO_LOW,      // set GPIO_LOW for falling, set 0 for rising
             .iomux      = {
-                .name   = NULL,
+                .name   = "bt_host_wake",
+		  .fgpio      = GPIO3_C6,
             },
         },
     },

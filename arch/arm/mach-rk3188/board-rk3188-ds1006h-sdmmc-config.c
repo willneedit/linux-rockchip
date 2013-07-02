@@ -72,9 +72,9 @@ int rk31sdk_get_sdmmc0_pin_io_voltage(void)
     #define RK30SDK_WIFI_GPIO_POWER_N               GPIO3_A0            
     #define RK30SDK_WIFI_GPIO_POWER_ENABLE_VALUE    GPIO_LOW//GPIO_HIGH        
     
-#elif defined(CONFIG_BCM4329) || defined(CONFIG_BCM4319) || defined(CONFIG_RK903) || defined(CONFIG_RK901) || defined(CONFIG_AP6330) || defined(CONFIG_AP6210)
-    #define RK30SDK_WIFI_GPIO_POWER_N            RK30_PIN3_PD0//INVALID_GPIO// RK30_PIN3_PD0                 
-    #define RK30SDK_WIFI_GPIO_POWER_ENABLE_VALUE    GPIO_LOW//GPIO_HIGH                   
+#elif defined(CONFIG_BCM4329) || defined(CONFIG_BCM4319) || defined(CONFIG_RK903) || defined(CONFIG_RK901) || defined(CONFIG_AP6330) || defined(CONFIG_AP6210)|| defined(CONFIG_AP6181)
+    #define RK30SDK_WIFI_GPIO_POWER_N            RK30_PIN3_PD0//RK30_PIN3_PD0//INVALID_GPIO// RK30_PIN3_PD0                 
+    #define RK30SDK_WIFI_GPIO_POWER_ENABLE_VALUE    GPIO_HIGH//GPIO_LOW//GPIO_HIGH               
 
     #define RK30SDK_WIFI_GPIO_RESET_N               INVALID_GPIO//RK30_PIN2_PA7 
     #define RK30SDK_WIFI_GPIO_RESET_ENABLE_VALUE    GPIO_LOW//GPIO_HIGH 
@@ -139,7 +139,7 @@ int rk31sdk_get_sdio_wifi_voltage(void)
     /******************************************************************************
     **  Please tell me how much wifi-module uses voltage in your project.  
     ******************************************************************************/
-#if defined(CONFIG_BCM4329) || defined(CONFIG_BCM4319) || defined(CONFIG_RK903) || defined(CONFIG_RK901) || defined(CONFIG_AP6330) || defined(CONFIG_AP6210)
+#if defined(CONFIG_BCM4329) || defined(CONFIG_BCM4319) || defined(CONFIG_RK903) || defined(CONFIG_RK901) || defined(CONFIG_AP6330) || defined(CONFIG_AP6210)|| defined(CONFIG_AP6181)
     voltage = 1800 ; //power 1800mV   
     
 #elif defined(CONFIG_MT5931_MT6622)||defined(CONFIG_MT5931)

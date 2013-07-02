@@ -1179,7 +1179,8 @@ int gpio_request(unsigned gpio, const char *label)
 	struct gpio_chip	*chip;
 	int			status = -EINVAL;
 	unsigned long		flags;
-
+printk("*****gpiolib.c ---gpio_request gpio = %d**********nition\n",gpio);//add by nition
+//dump_stack();//add by nition
 	spin_lock_irqsave(&gpio_lock, flags);
 
 	if (!gpio_is_valid(gpio))

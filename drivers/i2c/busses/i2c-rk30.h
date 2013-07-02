@@ -32,7 +32,7 @@
 #define i2c_dbg(dev, format, arg...)
 #endif
 
-#define I2C_CHECK_IDLE
+//#define I2C_CHECK_IDLE    // modify by nition
 
 #define i2c_writel                 writel_relaxed
 #define i2c_readl                  readl_relaxed
