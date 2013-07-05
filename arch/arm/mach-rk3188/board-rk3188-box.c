@@ -480,7 +480,7 @@ printk("****************wifi_gpio = %d\n",wifi_gpio_vule);
 #endif
 //iomux_set(GPIO3_D0);
 //gpio_pull_updown(RK30_PIN3_PD0, 1);
-
+//gpio_direction_output(RK30_PIN1_PA3, 1);
 /***add by nition s at 2013-06-20************/
 	return 0;
 }
@@ -1074,7 +1074,7 @@ static struct rfkill_rk_platform_data rfkill_rk_platdata = {
     },
 
     .rts_gpio           = { // UART_RTS, enable or disable BT's data coming
-        .io             = INVALID_GPIO, // set io to INVALID_GPIO for disable it
+        .io             = RK30_PIN1_PA3, // set io to INVALID_GPIO for disable it
         .enable         = GPIO_LOW,
         .iomux          = {
             .name       = "bt_rts",
