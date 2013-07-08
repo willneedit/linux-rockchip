@@ -439,11 +439,12 @@ static ssize_t force_usb_mode_store(struct device_driver *_drv, const char *_buf
 
 	switch(new_mode)
 	{
-		case USB_MODE_FORCE_HOST:
+		case USB_MODE_FORCE_HOST:   
 			if(USB_MODE_FORCE_DEVICE == core_if->usb_mode)
 			{/* device-->host */
 				core_if->usb_mode = new_mode;
-				dwc_otg_force_host(core_if);
+				dwc_otg_force_host(core_if);  
+				//dwc_otg_force_device(core_if);  //modify by nition
 			}
 			else if(USB_MODE_NORMAL == core_if->usb_mode)
 			{
@@ -460,11 +461,13 @@ static ssize_t force_usb_mode_store(struct device_driver *_drv, const char *_buf
 			else
 			    core_if->usb_mode = new_mode;
 			break;
-		case USB_MODE_FORCE_DEVICE:
+		case USB_MODE_FORCE_DEVICE:   
 			if(USB_MODE_FORCE_HOST == core_if->usb_mode)
 			{
 				core_if->usb_mode = new_mode;
-				dwc_otg_force_device(core_if);
+				dwc_otg_force_device(core_if); 
+				//dwc_otg_force_host(core_if);  //modify by nition
+				
 			}
 			else if(USB_MODE_NORMAL == core_if->usb_mode)
 			{
