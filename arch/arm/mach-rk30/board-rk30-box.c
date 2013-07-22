@@ -58,11 +58,14 @@
 #if defined(CONFIG_MU509)
 #include <linux/mu509.h>
 #endif
+#if defined(CONFIG_MT6229)
+#include <linux/mt6229.h>
+#endif
 #if defined(CONFIG_MW100)
 #include <linux/mw100.h>
 #endif
-#if defined(CONFIG_MT6229)
-#include <linux/mt6229.h>
+#if defined (CONFIG_BP_AUTO)
+#include <linux/bp-auto.h>
 #endif
 #if defined(CONFIG_SEW868)
 #include <linux/sew868.h>
@@ -1086,7 +1089,7 @@ static struct platform_device irda_device = {
 #endif
 
 #ifdef CONFIG_ION
-#define ION_RESERVE_SIZE        (80 * SZ_1M)
+#define ION_RESERVE_SIZE        (120 * SZ_1M)
 static struct ion_platform_data rk30_ion_pdata = {
 	.nr = 1,
 	.heaps = {
@@ -1582,6 +1585,9 @@ static struct platform_device *devices[] __initdata = {
 #endif
 #ifdef CONFIG_MT5931_MT6622
 	&device_mt6622,
+#endif
+#if defined(CONFIG_BP_AUTO)
+	&device_bp_auto,
 #endif
 #ifdef CONFIG_RK_REMOTECTL	
     &rk30_device_remotectl,
