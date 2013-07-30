@@ -62,7 +62,7 @@ static struct rt5616_init_reg init_list[] = {
 	{RT5616_STO1_ADC_MIXER	, 0x3802},
 	//{RT5616_AD_DA_MIXER		, 0x0000},  //test add by nition of make  mic voice direct to hp 
 	//{RT5616_ADC_DIG_VOL	, 0xffff},//test by nition
-	{RT5616_IN1_IN2		,0x0140}//0x8840//0x5540} //0x0140} //20db  modify by nition
+	{RT5616_IN1_IN2		,0x5540}//0x8840//0x5540} //0x0140} //20db  modify by nition
 	
 };
 #define RT5616_INIT_REG_LEN ARRAY_SIZE(init_list)
