@@ -256,8 +256,8 @@ static struct rkxx_remotectl_button remotectl_button[] =
 {
     {  
        .usercode = 0x202, 
-       .nbuttons =  9, 
-       .key_table = &remote_key_table_tongfang[0],
+       .nbuttons =  22, 
+       .key_table = &remote_key_table_meiyu_202[0],
     },
     {  
        .usercode = 0xdf, 

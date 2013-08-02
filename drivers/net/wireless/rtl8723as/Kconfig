@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 config RTL8723AS
 	tristate "Realtek 8723A SDIO WiFi Support"
 	select WIRELESS_EXT
@@ -7,7 +6,6 @@ config RTL8723AS
 	---help---
 	  Help message of RTL8723AS
 
-=======
     config RTL8723AS
           tristate "Realtek 8723AS SDIO WiFi Support"
           depends on WLAN_80211 && MMC
@@ -16,4 +14,3 @@ config RTL8723AS
           select IEEE80211
           ---help---
           Help message of RTL8723AS
->>>>>>> dfed607477bc20914a2dd140008dc44ff9e40063
