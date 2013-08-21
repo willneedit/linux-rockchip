@@ -307,7 +307,8 @@ void request_suspend_state(suspend_state_t new_state)
        if(new_state==3){  //sleep
        struct act8846 *act8846 = g_act8846;
 	//ret = act8846_set_bits(act8846, 0xe4,(0x1<<7),(0x0<<7));
-		val=0xf;
+		val=0x87;//0xf;//close led
+		
 	ret = act8846_i2c_write(act8846->i2c, 0xe4, 1, val);
 	printk("act8846_i2c_write ret =%d ***********sleep\n",ret);
 	while(ret<0){
