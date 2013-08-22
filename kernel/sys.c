@@ -393,11 +393,6 @@ EXPORT_SYMBOL_GPL(kernel_halt);
  */
 void kernel_power_off(void)
 {
-//add by nition for act8846 pmu s
-gpio_request(RK30_PIN0_PA0, NULL);
-gpio_direction_output(RK30_PIN0_PA0, 0);	
-gpio_set_value(RK30_PIN0_PA0, 0);
-//add by nition for act8846 pmu s
 	kernel_shutdown_prepare(SYSTEM_POWER_OFF);
 	if (pm_power_off_prepare)
 		pm_power_off_prepare();
@@ -406,6 +401,11 @@ gpio_set_value(RK30_PIN0_PA0, 0);
 	printk(KERN_EMERG "Power down.\n");
 	kmsg_dump(KMSG_DUMP_POWEROFF);
 	machine_power_off();
+//add by nition for act8846 pmu s
+gpio_request(RK30_PIN0_PA0, NULL);
+gpio_direction_output(RK30_PIN0_PA0, 0);	
+gpio_set_value(RK30_PIN0_PA0, 0);
+//add by nition for act8846 pmu s
 }
 EXPORT_SYMBOL_GPL(kernel_power_off);
 

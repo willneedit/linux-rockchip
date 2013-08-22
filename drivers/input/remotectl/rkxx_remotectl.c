@@ -584,7 +584,7 @@ static irqreturn_t remotectl_isr(int irq, void *dev_id)
     //mod_timer(&ddata->timer,jiffies + msecs_to_jiffies(130));
 #ifdef CONFIG_PM
    if (ddata->state==RMC_PRELOAD)
-       wake_lock_timeout(&ddata->remotectl_wake_lock, HZ);
+    //   wake_lock_timeout(&ddata->remotectl_wake_lock, HZ); //modify by nition
    if ((get_suspend_state())&&(ddata->remotectl_suspend_data.cnt<50))		//zwm
        ddata->remotectl_suspend_data.scanTime[ddata->remotectl_suspend_data.cnt++] = ddata->period;
 #endif

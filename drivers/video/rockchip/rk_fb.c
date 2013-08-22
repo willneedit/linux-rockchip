@@ -777,7 +777,7 @@ static int rk_fb_wait_for_vsync_thread(void *data)
 	while (!kthread_should_stop()) {
 		ktime_t timestamp = dev_drv->vsync_info.timestamp;
 		int ret = wait_event_interruptible(dev_drv->vsync_info.wait,
-		//	!ktime_equal(timestamp, dev_drv->vsync_info.timestamp) &&   //modify by nition
+			!ktime_equal(timestamp, dev_drv->vsync_info.timestamp) &&   //modify by nition
 			dev_drv->vsync_info.active);
 
 		if (!ret) {

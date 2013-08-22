@@ -1356,8 +1356,8 @@ void __sramlocalfunc ddr_send_command(uint32 rank, uint32 cmd, uint32 arg)
 //!0 DTT失败
 uint32_t __sramlocalfunc ddr_data_training(void)
 {
-    uint32 value,cs;
-
+    //uint32 value,cs;
+    uint32 value,cs,i,byte=2;//fix ddr_fix_2cs_bug by nition
     // disable auto refresh
     value = pDDR_Reg->TREFI;
     pDDR_Reg->TREFI = 0;
@@ -1370,17 +1370,31 @@ uint32_t __sramlocalfunc ddr_data_training(void)
     // clear DTDONE status
     pPHY_Reg->PIR |= CLRSR;
     cs = ((pPHY_Reg->PGCR>>18) & 0xF);
+	pPHY_Reg->PGCR = (pPHY_Reg->PGCR & (~(0xF<<18))) | (1<<18);  //use cs0 dtt //fix ddr_fix_2cs_bug by nition
     // trigger DTT
     pPHY_Reg->PIR |= INIT | QSTRN | LOCKBYP | ZCALBYP | CLRSR | ICPC;
     dsb();
     // wait echo byte DTDONE
-    while((pPHY_Reg->DATX8[0].DXGSR[0] & cs) != cs);
-    while((pPHY_Reg->DATX8[1].DXGSR[0] & cs) != cs);
+   // while((pPHY_Reg->DATX8[0].DXGSR[0] & cs) != cs);
+   // while((pPHY_Reg->DATX8[1].DXGSR[0] & cs) != cs);
+    while((pPHY_Reg->DATX8[0].DXGSR[0] & 1) != 1);  //fix ddr_fix_2cs_bug by nition
+    while((pPHY_Reg->DATX8[1].DXGSR[0] & 1) != 1);  //fix ddr_fix_2cs_bug by nition
     if(!(pDDR_Reg->PPCFG & 1))
-    {
-        while((pPHY_Reg->DATX8[2].DXGSR[0] & cs) != cs);
-        while((pPHY_Reg->DATX8[3].DXGSR[0] & cs) != cs);  
+    {   //fix ddr_fix_2cs_bug by nition s
+        //while((pPHY_Reg->DATX8[2].DXGSR[0] & cs) != cs);
+        //while((pPHY_Reg->DATX8[3].DXGSR[0] & cs) != cs);  
+		while((pPHY_Reg->DATX8[2].DXGSR[0] & 1) != 1); 
+        while((pPHY_Reg->DATX8[3].DXGSR[0] & 1) != 1); 
+        byte=4;
     }
+    pPHY_Reg->PGCR = (pPHY_Reg->PGCR & (~(0xF<<18))) | (cs<<18);  //restore cs
+    for(i=0;i<byte;i++)
+    {
+        pPHY_Reg->DATX8[i].DXDQSTR = (pPHY_Reg->DATX8[i].DXDQSTR & (~((0x7<<3)|(0x3<<14)))) 
+                                      | ((pPHY_Reg->DATX8[i].DXDQSTR & 0x7)<<3)
+                                      | (((pPHY_Reg->DATX8[i].DXDQSTR>>12) & 0x3)<<14);
+    }
+	//fix ddr_fix_2cs_bug by nition e
     // send some auto refresh to complement the lost while DTT，//测到1个CS的DTT最长时间是10.7us。最多补2次刷新
     if(cs > 1)
     {
@@ -3988,7 +4002,8 @@ int ddr_init(uint32_t dram_speed_bin, uint32_t freq)
     uint32_t gsr,dqstr;
 
     ddr_print("version 1.00 20130712 \n");
-
+    ddr_print("fix 2cs bug\n");
+	
     mem_type = pPHY_Reg->DCR.b.DDRMD;
     ddr_speed_bin = dram_speed_bin;
 
