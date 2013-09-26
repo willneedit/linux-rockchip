@@ -361,7 +361,6 @@ static int rk_fb_ioctl(struct fb_info *info, unsigned int cmd,unsigned long arg)
 			printk("rk fb use %d buffers\n",num_buf);
 			break;
 		case RK_FBIOSET_VSYNC_ENABLE:
-			return 0;
 			if (copy_from_user(&enable, argp, sizeof(enable)))
 				return -EFAULT;
 			dev_drv->vsync_info.active = enable;
@@ -896,9 +895,19 @@ int rk_fb_switch_screen(rk_screen *screen ,int enable ,int lcdc_id)
 		return -ENODEV;
 		
 	}
-
-	info = inf->fb[dev_drv->fb_index_base];
-		
+	
+	if((lcdc_id == 0) || (inf->num_lcdc == 1))
+	{
+		info = inf->fb[0];
+	}
+	else if((lcdc_id == 1)&&(inf->num_lcdc == 2))
+	{
+		if(dev_drv->screen_ctr_info->prop == PRMRY)
+			info = inf->fb[0];
+		else
+		info = inf->fb[dev_drv->num_layer]; //the main fb of lcdc2
+	}
+	
 	layer_id = dev_drv->fb_get_layer(dev_drv,info->fix.id);
 	
 	if(!enable)

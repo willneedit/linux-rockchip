@@ -28,3 +28,6 @@ config MACH_RK3188_BOX
 	bool "RK3188 box board"
 	
 endchoice
+
+config X7MINI_WIFI_VOL
+        bool "X7MINI_WIFI_VOL"

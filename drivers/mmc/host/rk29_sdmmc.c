@@ -3864,6 +3864,7 @@ static int rk29_sdmmc_probe(struct platform_device *pdev)
 
 #endif
 	
+/*	
 #if defined(CONFIG_RK29_SDIO_IRQ_FROM_GPIO)
     if(RK29_CTRL_SDIO1_ID == host->pdev->id)
     {
@@ -3899,7 +3900,7 @@ static int rk29_sdmmc_probe(struct platform_device *pdev)
     }
 
 #endif
-    
+*/     
     /* setup sdmmc1 wifi card detect change */
     if (pdata->register_status_notify) {
         pdata->register_status_notify(rk29_sdmmc1_status_notify_cb, host);

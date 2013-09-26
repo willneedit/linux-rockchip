@@ -82,6 +82,9 @@ int rk31sdk_get_sdmmc0_pin_io_voltage(void)
 
     #define RK30SDK_WIFI_GPIO_RESET_N               INVALID_GPIO//RK30_PIN2_PA7 
     #define RK30SDK_WIFI_GPIO_RESET_ENABLE_VALUE    GPIO_LOW//GPIO_HIGH 
+	
+	#define RK30SDK_WIFI_GPIO_WIFI_INT_B                RK30_PIN3_PD2   //add by nition for update wifi
+    #define RK30SDK_WIFI_GPIO_WIFI_INT_B_ENABLE_VALUE   GPIO_HIGH       //add by nition for update wifi
 
 #elif defined(CONFIG_MT5931_MT6622) || defined(CONFIG_MT5931)
 
@@ -150,8 +153,11 @@ int rk31sdk_get_sdio_wifi_voltage(void)
     ******************************************************************************/
 //modify by nition 
 #if defined(CONFIG_BCM4329) || defined(CONFIG_BCM4319) || defined(CONFIG_RK903) || defined(CONFIG_RK901) || defined(CONFIG_AP6330) || defined(CONFIG_AP6210)|| defined(CONFIG_AP6181)
-    voltage = 1800 ; //power 1800mV   
-    
+ #ifdef CONFIG_X7MINI_WIFI_VOL   
+   voltage = 3300 ; //power 1800mV   
+ #else 
+   voltage = 1800 ; //power 1800mV 
+ #endif
 #elif defined(CONFIG_MT5931_MT6622)||defined(CONFIG_MT5931)
     voltage = 2800 ; //power 1800V
 #elif defined(CONFIG_MT6620) 
