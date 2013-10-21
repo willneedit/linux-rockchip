@@ -361,7 +361,11 @@ void InitHDMITX()
 {
 
     hdmitx_LoadRegSetting(HDMITX_Init_Table);
+//<<<<<<< HEAD
     HDMITX_WriteI2C_Byte(REG_TX_PLL_CTRL,0x3f);//0x3f//0xff modify by nition
+//=======
+//    HDMITX_WriteI2C_Byte(REG_TX_PLL_CTRL,0xff);
+//>>>>>>> 2e8863fc28521fe784564750e3e7e964c9a568e4
     hdmiTxDev[0].bIntPOL = (hdmiTxDev[0].bIntType&B_TX_INTPOL_ACTH)?TRUE:FALSE ;
 
     // Avoid power loading in un play status.
@@ -919,7 +923,15 @@ BOOL HDMITX_EnableVideoOutput(VIDEOPCLKLEVEL level,BYTE inputColorMode,BYTE outp
     // bInputVideoMode,bOutputVideoMode,hdmiTxDev[0].bInputVideoSignalType,bAudioInputType,should be configured by upper F/W or loaded from EEPROM.
     // should be configured by initsys.c
     // VIDEOPCLKLEVEL level ;
-
+    switch(level)
+    {
+	    case PCLK_HIGH:
+		    HDMITX_WriteI2C_Byte(REG_TX_PLL_CTRL,0x30 /*0xff*/);
+		    break ;
+	    default:
+		    HDMITX_WriteI2C_Byte(REG_TX_PLL_CTRL,0x00);
+            break ;
+    }
     HDMITX_WriteI2C_Byte(REG_TX_SW_RST,B_HDMITX_VID_RST|B_HDMITX_AUD_RST|B_TX_AREF_RST|B_TX_HDCP_RST_HDMITX);
 
     hdmiTxDev[0].bHDMIMode = (BYTE)bHDMI ;

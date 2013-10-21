@@ -1,5 +1,8 @@
+//<<<<<<< HEAD
 /*$_rbox_$_ modify _$hzb,20120522*/
 /*$_rbox_$_ modify _$add this file for rk29 remotectl*/
+//=======
+//>>>>>>> 2e8863fc28521fe784564750e3e7e964c9a568e4
 
 /*
  * Driver for keys on GPIO lines capable of generating interrupts.
@@ -584,7 +587,11 @@ static irqreturn_t remotectl_isr(int irq, void *dev_id)
     //mod_timer(&ddata->timer,jiffies + msecs_to_jiffies(130));
 #ifdef CONFIG_PM
    if (ddata->state==RMC_PRELOAD)
+//<<<<<<< HEAD
     //   wake_lock_timeout(&ddata->remotectl_wake_lock, HZ); //modify by nition
+//=======
+//       wake_lock_timeout(&ddata->remotectl_wake_lock, HZ);
+//>>>>>>> 2e8863fc28521fe784564750e3e7e964c9a568e4
    if ((get_suspend_state())&&(ddata->remotectl_suspend_data.cnt<50))		//zwm
        ddata->remotectl_suspend_data.scanTime[ddata->remotectl_suspend_data.cnt++] = ddata->period;
 #endif
