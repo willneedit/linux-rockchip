@@ -158,8 +158,7 @@ out:
 
 static void hdmi_wq_insert(struct hdmi *hdmi)
 {
-	DBG("%s", __FUNCTION__);
-	hdmi_send_uevent(hdmi, KOBJ_ADD);
+	DBG("%s", __FUNCTION__);	
 	if(hdmi->ops->insert)
 		hdmi->ops->insert(hdmi);
 	hdmi_wq_parse_edid(hdmi);
@@ -223,14 +222,18 @@ static void hdmi_work_queue(struct work_struct *work)
 	switch(event) {
 		case HDMI_ENABLE_CTL:
 			if(!hdmi->enable) {
-				if(!hdmi->sleep && hdmi->ops->enable)
-					hdmi->ops->enable(hdmi);
 				hdmi->enable = 1;
+				if(!hdmi->sleep) {
+					if(hdmi->ops->enable)
+						hdmi->ops->enable(hdmi);
+					if(hdmi->hotplug == HDMI_HPD_ACTIVED)
+						hdmi_wq_insert(hdmi);
+				}
 			}
 			break;
 		case HDMI_RESUME_CTL:
 			if(hdmi->sleep) {
-				if(hdmi->enable && hdmi->ops->enable)
+				if(hdmi->ops->enable)
 					hdmi->ops->enable(hdmi);
 				hdmi->sleep = 0;
 			}
@@ -238,8 +241,8 @@ static void hdmi_work_queue(struct work_struct *work)
 		case HDMI_DISABLE_CTL:
 			if(hdmi->enable) {
 				if(!hdmi->sleep) {
-					if(hdmi->ops->disable)
-						hdmi->ops->disable(hdmi);
+//					if(hdmi->ops->disable)
+//						hdmi->ops->disable(hdmi);
 					hdmi_wq_remove(hdmi);
 				}
 				hdmi->enable = 0;
@@ -260,13 +263,16 @@ static void hdmi_work_queue(struct work_struct *work)
 				hpd = hdmi->ops->getStatus(hdmi);
 			DBG("hdmi_work_queue() - hpd is %d hotplug is %d", hpd, hdmi->hotplug);
 			if(hpd != hdmi->hotplug) {
-				hdmi->hotplug = hpd;
 				if(hpd == HDMI_HPD_ACTIVED) {
-					hdmi_wq_insert(hdmi);
+					hdmi->hotplug = hpd;
+					hdmi_send_uevent(hdmi, KOBJ_ADD);
+					if(hdmi->enable)
+						hdmi_wq_insert(hdmi);
 				}
-				else if(hdmi->hotplug == HDMI_HPD_REMOVED) {
+				else if(hdmi->hotplug == HDMI_HPD_ACTIVED) {
 					hdmi_wq_remove(hdmi);
 				}
+				hdmi->hotplug = hpd;
 			}
 			break;
 		case HDMI_SET_VIDEO:
@@ -378,8 +384,8 @@ struct hdmi *hdmi_register(struct hdmi_property *property, struct hdmi_ops *ops)
 		hdmi->switchdev.name="hdmi";
 	else {
 		hdmi->switchdev.name = kzalloc(32, GFP_KERNEL);
-		memset(hdmi->switchdev.name, 0, 32);
-		sprintf(hdmi->switchdev.name, "hdmi%d", hdmi->id);
+		memset((char*)hdmi->switchdev.name, 0, 32);
+		sprintf((char*)hdmi->switchdev.name, "hdmi%d", hdmi->id);
 	}
 	switch_dev_register(&(hdmi->switchdev));
 	#endif
@@ -430,7 +436,7 @@ int hdmi_config_audio(struct hdmi_audio	*audio)
 	struct hdmi *hdmi;
 	if(audio == NULL)
 		return HDMI_ERROR_FALSE;
-        //printk(KERN_ERR "hdmi_config_audio\n");	
+	//printk(KERN_ERR "hdmi_config_audio\n");
 	for(i = 0; i < HDMI_MAX_ID; i++)
 	{
 		if(ref_info[i].ref ==0)
@@ -439,9 +445,11 @@ int hdmi_config_audio(struct hdmi_audio	*audio)
 
 		//printk(KERN_ERR "eenable %d, sleep %d\n", hdmi->enable, hdmi->sleep);
 		// Same as current audio setting, return.
-		//if(memcmp(audio, &hdmi->audio, sizeof(struct hdmi_audio)) == 0)
-			//continue;
-
+		//Warning: rk30 hdmi bug: fixed hdmi noise, another workaround is keeping i2s always on.
+		#if 0
+		if(memcmp(audio, &hdmi->audio, sizeof(struct hdmi_audio)) == 0)
+			continue;
+		#endif
 		/*for(j = 0; j < hdmi->edid.audio_num; j++)
 		{
 			if(audio->type == hdmi->edid.audio_num)

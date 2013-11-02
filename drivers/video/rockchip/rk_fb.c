@@ -94,8 +94,9 @@ static int rk_fb_open(struct fb_info *info,int user)
     }
     else
     {
-    	dev_drv->open(dev_drv,layer_id,1);
-	dev_drv->load_screen(dev_drv,1);
+    	dev_drv->layer_par[layer_id]->state = 1;
+    	if(dev_drv->enable)
+    		dev_drv->open(dev_drv,layer_id,1);
     }
     
     return 0;
@@ -104,7 +105,7 @@ static int rk_fb_open(struct fb_info *info,int user)
 
 static int rk_fb_close(struct fb_info *info,int user)
 {
-	#ifdef CONFIG_LCDC_OVERLAY_ENABLE
+//	#ifdef CONFIG_LCDC_OVERLAY_ENABLE
 	struct rk_lcdc_device_driver * dev_drv = (struct rk_lcdc_device_driver * )info->par;
 	int layer_id;
 //	CHK_SUSPEND(dev_drv);
@@ -115,9 +116,11 @@ static int rk_fb_close(struct fb_info *info,int user)
 	}
 	else
 	{
-    		dev_drv->open(dev_drv,layer_id,0);
+    	dev_drv->layer_par[layer_id]->state = 0;
+    	if(dev_drv->enable)
+			dev_drv->open(dev_drv, layer_id, 0);
 	}
-	#endif
+//	#endif
     	return 0;
 }
 static void fb_copy_by_ipp(struct fb_info *dst_info, struct fb_info *src_info,int offset)
@@ -221,7 +224,8 @@ static int rk_pan_display(struct fb_var_screeninfo *var, struct fb_info *info)
 		case ARGB888:
 		case ABGR888:
 			#ifdef CONFIG_LCDC_OVERLAY_ENABLE
-			yoffset += (var->yres - screen->y_res) + (screen->y_res - screen->y_res*dev_drv->x_scale/100)/2;
+			if(dev_drv->overlay)
+				yoffset += var->yres - screen->y_res;
 			#endif
 			par->y_offset = (yoffset*xvir + xoffset)*4;
 			break;
@@ -283,7 +287,7 @@ static int rk_fb_ioctl(struct fb_info *info, unsigned int cmd,unsigned long arg)
 	int ovl;	//overlay:0 win1 on the top of win0;1,win0 on the top of win1
 	int num_buf; //buffer_number
 	void __user *argp = (void __user *)arg;
-	
+	int new_layer_id;
 	#if defined(CONFIG_DUAL_LCDC_DUAL_DISP_IN_KERNEL)
 	struct rk_fb_inf *inf = dev_get_drvdata(info->device);
 	struct fb_info * info2;
@@ -306,7 +310,11 @@ static int rk_fb_ioctl(struct fb_info *info, unsigned int cmd,unsigned long arg)
 		case RK_FBIOSET_ENABLE:
 			if (copy_from_user(&enable, argp, sizeof(enable)))
 				return -EFAULT;
-			dev_drv->open(dev_drv,layer_id,enable);
+			if(dev_drv->layer_par[layer_id]->state != enable) {
+				dev_drv->layer_par[layer_id]->state = enable;
+				if(dev_drv->enable)
+					dev_drv->open(dev_drv,layer_id,enable);
+			}
 			break;
 		case RK_FBIOGET_ENABLE:
 			enable = dev_drv->get_layer_state(dev_drv,layer_id);
@@ -316,7 +324,20 @@ static int rk_fb_ioctl(struct fb_info *info, unsigned int cmd,unsigned long arg)
 		case RK_FBIOSET_OVERLAY_STATE:
 			if (copy_from_user(&ovl, argp, sizeof(ovl)))
 				return -EFAULT;
-			dev_drv->ovl_mgr(dev_drv,ovl,1);
+			//For some platform, when overlay is enabled, 
+			//fb may map to different physical layer, so we
+			//need to configure layer status.
+			dev_drv->overlay = ovl;
+			new_layer_id = dev_drv->fb_get_layer(dev_drv,info->fix.id);
+			if( layer_id != new_layer_id && 
+				dev_drv->layer_par[new_layer_id]->state != dev_drv->layer_par[layer_id]->state) {
+				enable = dev_drv->layer_par[layer_id]->state;
+				dev_drv->layer_par[layer_id]->state = dev_drv->layer_par[new_layer_id]->state;
+				dev_drv->open(dev_drv,layer_id, dev_drv->layer_par[new_layer_id]->state);
+				dev_drv->layer_par[new_layer_id]->state = enable;
+				dev_drv->open(dev_drv,new_layer_id, dev_drv->layer_par[new_layer_id]->state);
+            }
+//			dev_drv->ovl_mgr(dev_drv,ovl,1);
 			break;
 		case RK_FBIOGET_OVERLAY_STATE:
 			ovl = dev_drv->ovl_mgr(dev_drv,0,0);
@@ -478,19 +499,20 @@ static int rk_fb_set_par(struct fb_info *info)
 		xsize = screen->x_res;
 		ysize = screen->y_res;
 	}
+	if(xsize > screen->x_res)
+		xsize = screen->x_res;
+	if(ysize > screen->y_res)
+		ysize = screen->y_res;
 	
-	#ifdef CONFIG_LCDC_OVERLAY_ENABLE
-	if(strcmp(info->fix.id, "fb1") == 0 )
-	{
+	
+	if(dev_drv->overlay && !strcmp(info->fix.id, "fb1")) {
 		if((xsize == screen->x_res) && (ysize == screen->y_res) )
-	#endif
 		{
 			xpos = (screen->x_res - screen->x_res*dev_drv->x_scale/100)>>1;
 			ypos = (screen->y_res - screen->y_res*dev_drv->y_scale/100)>>1;
 			xsize = screen->x_res * dev_drv->x_scale/100;
 			ysize = screen->y_res * dev_drv->y_scale/100;
 		}
-	#ifdef CONFIG_LCDC_OVERLAY_ENABLE
 		else {
 			xsize = xsize * screen->x_res * dev_drv->x_scale/128000;
 			ysize = ysize * screen->y_res * dev_drv->y_scale/72000;
@@ -499,14 +521,12 @@ static int rk_fb_set_par(struct fb_info *info)
 			xpos += (screen->x_res - screen->x_res*dev_drv->x_scale/100)>>1;
 			ypos += (screen->y_res - screen->y_res*dev_drv->y_scale/100)>>1;
 		}
+	} else {
+		xpos = (screen->x_res - screen->x_res*dev_drv->x_scale/100)>>1;
+		ypos = (screen->y_res - screen->y_res*dev_drv->y_scale/100)>>1;
+		xsize = screen->x_res * dev_drv->x_scale/100;
+		ysize = screen->y_res * dev_drv->y_scale/100;
 	}
-	else {
-		xpos = (screen->x_res - screen->x_res*dev_drv->x_scale/100) >> 1;
-		ypos = 0;
-		xsize = screen->x_res;
-		ysize = screen->y_res;
-	}
-	#endif
 #if defined(CONFIG_ONE_LCDC_DUAL_OUTPUT_INF) || defined(CONFIG_NO_DUAL_DISP)
 	if(screen->screen_id == 0) //this is for device like rk2928 ,whic have one lcdc but two display outputs
 	{			   //save parameter set by android
@@ -602,7 +622,7 @@ static int rk_fb_set_par(struct fb_info *info)
 	par->smem_start =fix->smem_start;
 	par->cbr_start = fix->mmio_start;
 	#ifdef CONFIG_LCDC_OVERLAY_ENABLE
-	if(strcmp(info->fix.id, "fb0") == 0 ) {
+	if(dev_drv->overlay && strcmp(info->fix.id, "fb0") == 0 ) {
 		par->xact = xsize;              //winx active window height,is a part of vir
 		par->yact = ysize;
 	}
@@ -626,13 +646,12 @@ static int rk_fb_set_par(struct fb_info *info)
 					par2->format = par->format;
 					par2->smem_start = par->smem_start;
 					par2->cbr_start = par->cbr_start;
-					if(par2->xsize == 0)
-						par2->xsize = par->xsize;
-					if(par2->ysize == 0)
-						par2->ysize = par->ysize;
-//					if(par2->xvir == 0)
+					screen = dev_drv1->cur_screen;
+					par2->xpos = (screen->x_res - screen->x_res*dev_drv->x_scale/100)>>1;
+					par2->ypos = (screen->y_res - screen->y_res*dev_drv->y_scale/100)>>1;
+					par2->xsize = screen->x_res * dev_drv->x_scale/100;
+					par2->ysize = screen->y_res * dev_drv->y_scale/100;
 						par2->xvir = par->xvir;
-//					if(par2->yvir == 0)
 						par2->yvir = par->yvir;
 					info2->var.nonstd &= 0xffffff00;
 					info2->var.nonstd |= data_format;
@@ -829,17 +848,16 @@ int rk_fb_switch_screen(rk_screen *screen ,int enable ,int lcdc_id)
 {
 	struct rk_fb_inf *inf =  platform_get_drvdata(g_fb_pdev);
 	struct fb_info *info = NULL;
-	struct rk_lcdc_device_driver * dev_drv = NULL;
+	struct rk_lcdc_device_driver * dev_drv = NULL,*dev_drv1 = NULL;
 	struct fb_var_screeninfo *var = NULL;
 	struct fb_fix_screeninfo *fix = NULL;
 	char name[6];
 	int ret, i, layer_id;
 	u16 xpos, ypos, xsize, ysize;
-	
-	sprintf(name, "lcdc%d",lcdc_id);
+
 	for(i = 0; i < inf->num_lcdc; i++)  //find the driver the display device connected to
 	{
-		if(!strcmp(inf->lcdc_dev_drv[i]->name,name))
+		if(inf->lcdc_dev_drv[i]->id == lcdc_id)
 		{
 			dev_drv = inf->lcdc_dev_drv[i];
 			break;
@@ -852,46 +870,48 @@ int rk_fb_switch_screen(rk_screen *screen ,int enable ,int lcdc_id)
 		return -ENODEV;
 		
 	}
-	
-	if((lcdc_id == 0) || (inf->num_lcdc == 1))
-	{
-		info = inf->fb[0];
-	}
-	else if((lcdc_id == 1)&&(inf->num_lcdc == 2))
-	{
-		info = inf->fb[dev_drv->num_layer]; //the main fb of lcdc2
-	}
-	
-	layer_id = dev_drv->fb_get_layer(dev_drv,info->fix.id);
-	
+
+	dev_drv->enable = enable;
 	if(!enable)
 	{
-		if(dev_drv->layer_par[layer_id]->state) 
+		for(i = 0; i < dev_drv->num_layer; i++)
 		{
-			dev_drv->open(dev_drv,layer_id,enable); //disable the layer which attached to this fb
+			//disable the layer which attached to this fb
+			if(dev_drv->layer_par[i] && dev_drv->layer_par[i]->state)
+				dev_drv->open(dev_drv, i, 0);
 		}
 		return 0;
 	}
 	else
-	{
-		memcpy(dev_drv->cur_screen,screen,sizeof(rk_screen ));
-	}
+		memcpy(dev_drv->cur_screen, screen, sizeof(rk_screen));
 	
-	xpos = (dev_drv->cur_screen->x_res - dev_drv->cur_screen->x_res*dev_drv->x_scale/100)>>1;
-	ypos = (dev_drv->cur_screen->y_res - dev_drv->cur_screen->y_res*dev_drv->y_scale/100)>>1;
-	xsize = dev_drv->cur_screen->x_res * dev_drv->x_scale/100;
-	ysize = dev_drv->cur_screen->y_res * dev_drv->y_scale/100;
-	
-	var = &info->var;
-	var->nonstd &= 0xff;
-	var->nonstd |= (xpos << 8) + (ypos << 20);
-	var->grayscale &= 0xff;
-	var->grayscale |= (xsize << 8) + (ysize << 20);
-	if(dev_drv->layer_par[layer_id]->state != enable)
-		ret = info->fbops->fb_open(info,1);
 	ret = dev_drv->load_screen(dev_drv,1);
-	ret = info->fbops->fb_set_par(info);
-	ret = info->fbops->fb_pan_display(var, info);
+	for(i = 0; i < dev_drv->num_layer; i++) {
+		#if defined(CONFIG_NO_DUAL_DISP) && defined(CONFIG_LCDC_OVERLAY_ENABLE) 
+		info = inf->fb[i];
+		dev_drv1 = (struct rk_lcdc_device_driver * )info->par;
+		if(dev_drv1 != dev_drv) {
+			info->par = dev_drv;
+			dev_drv->overlay = dev_drv1->overlay;
+			dev_drv->x_scale = dev_drv1->x_scale;
+			dev_drv->y_scale = dev_drv1->y_scale;
+		}
+		memcpy(dev_drv->cur_screen, screen, sizeof(rk_screen));
+		#else
+		info = inf->fb[dev_drv->fb_index_base + i];
+		#endif
+		layer_id = dev_drv->fb_get_layer(dev_drv,info->fix.id);
+		if(dev_drv->layer_par[layer_id]) {
+			#if defined(CONFIG_NO_DUAL_DISP) && defined(CONFIG_LCDC_OVERLAY_ENABLE) 
+			if(dev_drv1 && dev_drv1->layer_par[layer_id])
+				dev_drv->layer_par[layer_id]->state = dev_drv1->layer_par[layer_id]->state;
+			#endif
+			if( dev_drv->layer_par[layer_id]->state)
+				dev_drv->open(dev_drv, layer_id, 1);
+		}
+		ret = info->fbops->fb_set_par(info);
+		ret = info->fbops->fb_pan_display(&info->var, info);
+	}
 	return 0;
 }
 #else
@@ -1037,7 +1057,7 @@ int rk_fb_switch_screen(rk_screen *screen ,int enable ,int lcdc_id)
 		dev_drv->screen1->ypos = 0;
 	}
 	ret = info->fbops->fb_open(info,1);
-	dev_drv->load_screen(dev_drv,1);
+//	dev_drv->load_screen(dev_drv,1);
 	ret = info->fbops->fb_set_par(info);
 	if(dev_drv->lcdc_hdmi_process)
 		dev_drv->lcdc_hdmi_process(dev_drv,enable);
@@ -1416,6 +1436,7 @@ int rk_fb_register(struct rk_lcdc_device_driver *dev_drv,
 				dev_drv->vsync_info.thread = NULL;
 			}
 			dev_drv->vsync_info.active = 1;
+			fbi->fbops->fb_open(fbi, 1);
 		}
 		fb_inf->fb[fb_inf->num_fb] = fbi;
 	        printk("%s>>>>>%s\n",__func__,fb_inf->fb[fb_inf->num_fb]->fix.id);
