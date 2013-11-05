@@ -2162,7 +2162,8 @@ static struct cpufreq_frequency_table dvfs_gpu_table[] = {
 static struct cpufreq_frequency_table dvfs_ddr_table[] = {
 	//{.frequency = 200 * 1000 + DDR_FREQ_SUSPEND,    .index = 950 * 1000},
 	{.frequency = 300 * 1000 + DDR_FREQ_VIDEO,      .index = 1000 * 1000},
-	{.frequency = 400 * 1000 + DDR_FREQ_NORMAL,     .index = 1100 * 1000},
+	{.frequency = 400 * 1000 + DDR_FREQ_NORMAL,     .index = 1100 * 1000},  
+//	{.frequency = 460 * 1000 + DDR_FREQ_NORMAL,     .index = 1100 * 1000}, //modify by nition
 	{.frequency = CPUFREQ_TABLE_END},
 };
 static struct cpufreq_frequency_table dvfs_ddr_table_t[] = {
@@ -2202,10 +2203,12 @@ void __init board_clock_init(void)
 	dvfs_set_freq_volt_table(clk_get(NULL, "cpu"), dvfs_arm_table);
 	dvfs_set_freq_volt_table(clk_get(NULL, "gpu"), dvfs_gpu_table);
 #if defined(CONFIG_ARCH_RK3188)
-	if (rk_pll_flag() == 0)
-		dvfs_set_freq_volt_table(clk_get(NULL, "ddr"), dvfs_ddr_table);
-	else
-		dvfs_set_freq_volt_table(clk_get(NULL, "ddr"), dvfs_ddr_table_t);
+	if (rk_pll_flag() == 0){
+//	printk("rk_pll_flag() == 0----------------------nition\n");
+		dvfs_set_freq_volt_table(clk_get(NULL, "ddr"), dvfs_ddr_table);}
+	else{
+//	printk("rk_pll_flag() == 1----------------------nition\n");
+		dvfs_set_freq_volt_table(clk_get(NULL, "ddr"), dvfs_ddr_table_t);}
 #else
 	dvfs_set_freq_volt_table(clk_get(NULL, "ddr"), dvfs_ddr_table);
 #endif
