@@ -311,8 +311,15 @@ struct hdmi {
 #define HDMI_AUTO_CONFIG		true
 
 // HDMI default vide mode
-#define HDMI_VIDEO_DEFAULT_MODE			HDMI_1280x720p_60HZ//HDMI_1920x1080p_60HZ
-
+//2013-08-30.zengjy+++s
+//#define HDMI_VIDEO_DEFAULT_MODE			HDMI_1280x720p_60HZ  //HDMI_1920x1080p_60HZ  //2013-08-30.zengjy ---
+#if defined(CONFIG_BOX_FB_1080P)  
+/* default HDMI output video mode */
+#define HDMI_VIDEO_DEFAULT_MODE			HDMI_1920x1080p_60HZ  //HDMI_1280x720p_60Hz//HDMI_1920x1080p_60Hz
+#else
+#define HDMI_VIDEO_DEFAULT_MODE			HDMI_1280x720p_60HZ   
+#endif
+//2013-08-30.zengjy+++e
 // HDMI default audio parameter
 #define HDMI_AUDIO_DEFAULT_TYPE 		HDMI_AUDIO_LPCM
 #define HDMI_AUDIO_DEFAULT_CHANNEL		2

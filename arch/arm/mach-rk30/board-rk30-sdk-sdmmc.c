@@ -222,6 +222,9 @@
     //reset
     #define RK30SDK_WIFI_GPIO_POWER_PIN_NAME        GPIO3D0_SDMMC1PWREN_NAME
     #define RK30SDK_WIFI_GPIO_POWER_IOMUX_FGPIO     GPIO3D_GPIO3D0
+	//interrupt
+	#define RK30SDK_WIFI_GPIO_WIFI_INT_B                RK30_PIN3_PD2
+    #define RK30SDK_WIFI_GPIO_WIFI_INT_B_ENABLE_VALUE   GPIO_HIGH
     
     #elif  defined(CONFIG_RTL8189ES)
         #define RK30SDK_WIFI_GPIO_POWER_N               RK30_PIN3_PD0
@@ -1795,8 +1798,8 @@ EXPORT_SYMBOL(rk29sdk_wifi_set_carddetect);
 
 static struct resource resources[] = {
 	{
-		.start = WIFI_HOST_WAKE,
-		.flags = IORESOURCE_IRQ,
+		.start = RK30SDK_WIFI_GPIO_WIFI_INT_B,
+		.flags = IORESOURCE_IRQ | IORESOURCE_IRQ_HIGHLEVEL | IORESOURCE_IRQ_SHAREABLE,
 		.name = "bcmdhd_wlan_irq",
 	},
 };
