@@ -133,6 +133,8 @@ static const char bt_name[] =
 		"ap6476"
 #elif defined(CONFIG_AP6493)
 		"ap6493"
+#elif defined(CONFIG_AP6234)
+        "ap6234"
 //<<<<<<< HEAD
 //#elif defined(CONFIG_GB86302I)
 //	"gb86302i"

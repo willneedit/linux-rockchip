@@ -1538,10 +1538,13 @@ static  struct pmu_info  act8846_ldo_info[] = {
 	{
 		.name          = "act_ldo3",   //vcc18_cif
 //add by nition for wifi vol s
-#ifdef CONFIG_X7MINI_WIFI_VOL     
-		.min_uv          = 1800000,//3300000,//1800000,
-		.max_uv         = 1800000,//3300000,//1800000,
-#else
+#if defined(CONFIG_X7MINI_WIFI_VOL)     
+		.min_uv          = 3300000,//1800000,//3300000,//1800000,
+		.max_uv         = 3300000,//1800000,//3300000,//1800000,
+#elif defined(CONFIG_AP6476) 
+        .min_uv          = 2800000,
+		.max_uv         = 2800000,
+#else 
         .min_uv          = 1800000,
 		.max_uv         = 1800000,
 #endif

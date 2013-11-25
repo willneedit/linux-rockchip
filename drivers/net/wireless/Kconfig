@@ -150,6 +150,18 @@ choice
 	config AP6493
 		bool "AP6493"
 		depends on RKWIFI && WLAN_80211
+	
+	config AP6234
+		bool "AP6234"
+		depends on RKWIFI && WLAN_80211
+		
+	config AP6335
+		bool "AP6335"
+		depends on RKWIFI && WLAN_80211
+		
+	config AP6441
+		bool "AP6441"
+		depends on RKWIFI && WLAN_80211
 
 	config GB86302I
 		bool "GB86302I"
