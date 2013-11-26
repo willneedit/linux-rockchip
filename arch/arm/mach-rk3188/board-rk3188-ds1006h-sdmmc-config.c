@@ -154,10 +154,10 @@ int rk31sdk_get_sdio_wifi_voltage(void)
 //modify by nition 
 #if defined(CONFIG_BCM4329) || defined(CONFIG_BCM4319) || defined(CONFIG_RK903) || defined(CONFIG_RK901) || defined(CONFIG_AP6330) || defined(CONFIG_AP6210)|| defined(CONFIG_AP6181)|| defined(CONFIG_AP6476)|| defined(CONFIG_AP6234)|| defined(CONFIG_AP6335)|| defined(CONFIG_AP6441)
  #if defined(CONFIG_X7MINI_WIFI_VOL)   
-   voltage = 3300 ; //power 1800mV   
-   // voltage = 1800 ; //power 1800mV    //test for nition
- #elif defined(CONFIG_AP6476)
-    voltage = 2800 ; //power 2800mV 
+  // voltage = 3300 ; //power 1800mV   
+    voltage = 1800 ; //power 1800mV    //test for nition
+ #elif defined(CONFIG_AP6234)
+    voltage = 3300 ; //power 3300mV 
  #else
     voltage = 1800 ; //power 1800mV 
  #endif
