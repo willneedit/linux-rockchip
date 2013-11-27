@@ -779,8 +779,9 @@ static int rk_fb_wait_for_vsync_thread(void *data)
 	struct rk_lcdc_device_driver  *dev_drv = data;
 	struct rk_fb_inf *inf =  platform_get_drvdata(g_fb_pdev);
 	struct fb_info *fbi = inf->fb[0];
-
+	
 	while (!kthread_should_stop()) {
+		dev_drv = (struct rk_lcdc_device_driver * )fbi->par;
 		ktime_t timestamp = dev_drv->vsync_info.timestamp;
 		int ret = wait_event_interruptible(dev_drv->vsync_info.wait,
 			!ktime_equal(timestamp, dev_drv->vsync_info.timestamp) &&   //modify by nition
@@ -897,6 +898,13 @@ int rk_fb_switch_screen(rk_screen *screen ,int enable ,int lcdc_id)
 			dev_drv->overlay = dev_drv1->overlay;
 			dev_drv->x_scale = dev_drv1->x_scale;
 			dev_drv->y_scale = dev_drv1->y_scale;
+			dev_drv->vsync_info.active = dev_drv1->vsync_info.active;
+			// We need to notify vsync thread that lcdc mapped to fb0 is changed.
+			if(i == 0) {
+				dev_drv1->vsync_info.timestamp = ktime_get();
+				dev_drv1->vsync_info.active = 1;
+				wake_up_interruptible_all(&dev_drv1->vsync_info.wait);
+			}
 		}
 		memcpy(dev_drv->cur_screen, screen, sizeof(rk_screen));
 		#else
@@ -1421,7 +1429,9 @@ int rk_fb_register(struct rk_lcdc_device_driver *dev_drv,
 		    ret = -EINVAL;
 		}
 		rkfb_create_sysfs(fbi);
-
+		fb_inf->fb[fb_inf->num_fb] = fbi;
+		printk("%s>>>>>%s\n",__func__,fb_inf->fb[fb_inf->num_fb]->fix.id);
+		fb_inf->num_fb++;	
 		if(i == 0)
 		{
 			init_waitqueue_head(&dev_drv->vsync_info.wait);
@@ -1442,9 +1452,6 @@ int rk_fb_register(struct rk_lcdc_device_driver *dev_drv,
 			dev_drv->vsync_info.active = 1;
 			fbi->fbops->fb_open(fbi, 1);
 		}
-		fb_inf->fb[fb_inf->num_fb] = fbi;
-		printk("%s>>>>>%s\n",__func__,fb_inf->fb[fb_inf->num_fb]->fix.id);
-		fb_inf->num_fb++;	
 	}
 #if !defined(CONFIG_FRAMEBUFFER_CONSOLE) && defined(CONFIG_LOGO)
     if(dev_drv->screen_ctr_info->prop == PRMRY) //show logo for primary display device
