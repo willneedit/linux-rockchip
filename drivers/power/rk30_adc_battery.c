@@ -1066,9 +1066,9 @@ static int rk30_adc_battery_io_init(struct rk30_adc_battery_platform_data *pdata
 	
 	//charge control pin
 	if (pdata->charge_set_pin != INVALID_GPIO){
-	    	ret = gpio_request(pdata->charge_set_pin, NULL);
+	    	ret = gpio_request(pdata->charge_set_pin, "charge_control");
 	    	if (ret) {
-	    		printk("failed to request dc_det gpio\n");
+	    		printk("failed to request charge_control gpio\n");
 	    		goto error;
 		    	}
 	    	gpio_direction_output(pdata->charge_set_pin, 1 - pdata->charge_set_level);
@@ -1076,7 +1076,7 @@ static int rk30_adc_battery_io_init(struct rk30_adc_battery_platform_data *pdata
 	
 	//dc charge detect pin
 	if (pdata->dc_det_pin != INVALID_GPIO){
-	    	ret = gpio_request(pdata->dc_det_pin, NULL);
+	    	ret = gpio_request(pdata->dc_det_pin, "dc_det");
 	    	if (ret) {
 	    		printk("failed to request dc_det gpio\n");
 	    		goto error;
@@ -1092,7 +1092,7 @@ static int rk30_adc_battery_io_init(struct rk30_adc_battery_platform_data *pdata
 	
 	//charge ok detect
 	if (pdata->charge_ok_pin != INVALID_GPIO){
- 		ret = gpio_request(pdata->charge_ok_pin, NULL);
+ 		ret = gpio_request(pdata->charge_ok_pin, "charge_ok");
 	    	if (ret) {
 	    		printk("failed to request charge_ok gpio\n");
 	    		goto error;
@@ -1107,7 +1107,7 @@ static int rk30_adc_battery_io_init(struct rk30_adc_battery_platform_data *pdata
 	}
 	//batt low pin
 	if( pdata->batt_low_pin != INVALID_GPIO){
- 		ret = gpio_request(pdata->batt_low_pin, NULL);
+ 		ret = gpio_request(pdata->batt_low_pin, "batt_low");
 	    	if (ret) {
 	    		printk("failed to request batt_low_pin gpio\n");
 	    		goto error;
