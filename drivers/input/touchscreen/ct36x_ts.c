@@ -353,6 +353,8 @@ static void ct360_ts_work_func(struct work_struct *work)
 			point_num = buf[i]>>3;
 			point_pressure = (buf[i+5]*4)>=255? 255 : (buf[i+5]*4);
 
+			y = ts->y_max - y;
+
 			if((point_status == 1) || (point_status == 2)){
 				input_mt_slot(ts->input_dev, point_num-1);
 				input_report_abs(ts->input_dev, ABS_MT_TRACKING_ID, point_num-1);

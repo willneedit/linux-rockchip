@@ -93,10 +93,10 @@ int rk31sdk_get_sdmmc0_pin_io_voltage(void)
     	//#define RK30SDK_WIFI_GPIO_RESET_ENABLE_VALUE    GPIO_HIGH
 
 	#else
-    	#define RK30SDK_WIFI_GPIO_POWER_N               RK30_PIN0_PA5
+    	#define RK30SDK_WIFI_GPIO_POWER_N               RK30_PIN3_PD0
     	#define RK30SDK_WIFI_GPIO_POWER_ENABLE_VALUE    GPIO_HIGH
 
-    	#define RK30SDK_WIFI_GPIO_RESET_N               RK30_PIN3_PD1
+    	#define RK30SDK_WIFI_GPIO_RESET_N               INVALID_GPIO // RK30_PIN3_PD1
     	#define RK30SDK_WIFI_GPIO_RESET_ENABLE_VALUE    GPIO_HIGH	
 	#endif
 
@@ -156,7 +156,7 @@ int rk31sdk_get_sdio_wifi_voltage(void)
     voltage = 1800 ; //power 1800mV
     
 #elif defined(CONFIG_MT5931_MT6622)||defined(CONFIG_MT5931)
-    voltage = 1800 ; //power 1800V
+    voltage = 2800 ; //power 2800mV, was 1800
 #elif defined(CONFIG_ESP8089)
 	voltage = 3000 ; //power 3000V
 #elif defined(CONFIG_MT6620) 
